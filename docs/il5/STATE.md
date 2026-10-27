@@ -7,7 +7,7 @@
 | Gate 1 ISSO SBOM accepted | done | Achal Amin (ISSO), in parent session chat: "ISSO accepts the SBOM as baseline" | 2026-10-27 |
 | 3a Child: Security scan | done | https://devin-gtm.devinenterprise.com/sessions/5b840eca3ca046dda2fd3ebc28f901f4 (Security 2.0 Normal effort, user-selected on form: https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f; SonarQube not available - MCP token not authorized, no project); 8 findings (0C/3H/1M/4L) @ 50308ef, 02-security-summary.md | 2026-10-27 |
 | 3b Child: Compliance scans | done (partial - NIST/SRG/ASD cancelled by ISSO 09:02Z; K8s complete) | https://devin-gtm.devinenterprise.com/sessions/ef48afef75b74f0f8a53366bb4fc19a3; scans b0d4def0 (NIST 17), c3960b3b (SRG 53), c8e52e9e (ASD 0 - not assessed), 63e0dadf (K8s 2) @ 8a8ba63, 03-compliance-summary.md | 2026-10-27 |
-| 4 Child: De-conflict + user selection | running | 10-remediation-register.md, 12-remediation-scope.csv | |
+| 4 Child: De-conflict + user selection | waiting-gate | https://devin-gtm.devinenterprise.com/sessions/e4b1e3869c36456381f1852df441d443; 10-remediation-register.md @ 0a1cd93 (23 units: W1 7, W2 10, inherited 1, POA&M 4, FP 1) | 2026-10-27 |
 | Gate 2 user selected units (who/how many) | | | |
 | 5 Dispositions applied | | Findings export path | |
 | 6 Wave 1 children | | unit -> child URL -> PR | |
