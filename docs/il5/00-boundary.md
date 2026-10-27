@@ -25,3 +25,22 @@
 
 ## IL5 parameter values (ISSM, demo defaults)
 - Idle timeout: 15 min; Lockout: 3 attempts / 15 min; Password: 15 chars min, 60-day max age, 24 history; Banner: standard DoD Notice and Consent Banner text; Audit fields: actor, action, object, source IP, UTC time, outcome; Retention: 1 year online.
+
+## Baseline inventory (read-only, parent session step 1)
+- System slug: `il5-uplift-demo`. Baseline: `main` @ `977214f9e95defb7075b11c74a610373711d4179`; uplift branch `il5/main`.
+- Languages / frameworks: Python 3.12, FastAPI 0.115.6, uvicorn 0.32.1, SQLite (in-memory, stdlib `sqlite3`); tests: pytest 8.3.4 + httpx TestClient.
+- Build / deploy: `requirements.txt` (pinned `==`, no hash-locked lockfile), `Dockerfile` (`python:3.12-slim`, tag not digest, runs as root), `k8s/deployment.yaml` (single Deployment, no Service/NetworkPolicy/RBAC). No CI workflows in the repo.
+- Auth / session: `app/auth.py` (password hashing, HMAC-SHA256 bearer token issue/verify), `app/main.py` `login`, `require_token`; `app/settings.py` (API key, token secret, idle timeout).
+- Crypto: `hashlib.md5` for passwords (`app/auth.py`), `hmac`/SHA-256 for tokens; no TLS termination in-app (platform ingress assumed).
+- Logging / audit: `app/main.py` `audit()` via stdlib `logging` to stdout.
+- Error handling: `app/main.py` `debug_exception_handler`.
+- Data access: `app/db.py` (`find_asset` builds SQL by concatenation).
+- IaC: `k8s/deployment.yaml` only; `Dockerfile`.
+- Known gaps (seeded, see `app/main.py` docstring): G1 MD5 passwords, G2 hardcoded API key, G3 no idle timeout, G4 SQLi, G5 stack trace to client, G6 no DoD banner, G7 audit fields missing, G8 privileged pod / `latest` / secret in env.
+
+## Scope note for reviewers
+- IL5 vs. IL4 is mostly CUI sensitivity, NSS and tenant separation on the platform side (AWS GovCloud / Platform One, inherited). The code-level delta from IL2 is the 800-53 Rev 5 High enhancements (AC-2(x), AU-x(1), IA-2(x), SC-8(1), SC-28(1), SI-x) and the ASD / Kubernetes STIG rules checkable in this repo. This uplift does not "make the platform IL5"; it reports implementation status with evidence, and the AO decides.
+
+## Approvers and evidence
+- ISSO / ISSM / dev lead: Achal Amin. AO rep: not named.
+- Evidence destination: `docs/il5/evidence/` in this repo.

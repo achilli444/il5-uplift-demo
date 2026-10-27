@@ -1,9 +1,9 @@
-# IL5 uplift state - <system-slug>  (parent session updates this after every step; `--resume` reads it)
+# IL5 uplift state - il5-uplift-demo  (parent session updates this after every step; `--resume` reads it)
 
 | Step | Status (todo / running / waiting-gate / done) | Evidence / URLs | Updated |
 |---|---|---|---|
-| 1 Init + boundary | | 00-boundary.md @ <sha> | |
-| 2 Child: SBOM | | child URL, package path | |
+| 1 Init + boundary | done | 00-boundary.md on il5/main; baseline main @ 977214f | 2026-10-27 |
+| 2 Child: SBOM | running | child URL, package path | 2026-10-27 |
 | Gate 1 ISSO SBOM accepted | | approver, date, message link | |
 | 3a Child: Security scan | | child URL, scan IDs, 02-security-summary.md | |
 | 3b Child: Compliance scans | | child URL, scan IDs, 03-compliance-summary.md | |
@@ -18,7 +18,9 @@
 | Gate 4 package to AO | | | |
 | 10 Automations | | automation IDs | |
 
-Repos/branch: 
-Evidence destination: 
-Approvers: ISSO <>, ISSM <>, dev lead <>, AO rep <>
+Repos/branch: achilli444/il5-uplift-demo, deploy branch main, uplift branch il5/main
+Evidence destination: docs/il5/evidence/ (repo)
+Approvers: ISSO Achal Amin, ISSM Achal Amin, dev lead Achal Amin, AO rep (not named)
 ISSM parameter values: see 00-boundary.md
+
+Parent session: https://devin-gtm.devinenterprise.com/sessions/d21b4bd30b9842b68f8283df20b9a52e
