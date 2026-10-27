@@ -3,8 +3,8 @@
 | Step | Status (todo / running / waiting-gate / done) | Evidence / URLs | Updated |
 |---|---|---|---|
 | 1 Init + boundary | done | 00-boundary.md on il5/main; baseline main @ 977214f | 2026-10-27 |
-| 2 Child: SBOM | running | https://devin-gtm.devinenterprise.com/sessions/92802104a79942b2ba71f310cdfa439c -> docs/il5/evidence/sbom/ | 2026-10-27 |
-| Gate 1 ISSO SBOM accepted | | approver, date, message link | |
+| 2 Child: SBOM | done | https://devin-gtm.devinenterprise.com/sessions/92802104a79942b2ba71f310cdfa439c -> docs/il5/evidence/sbom/ @ 9aa43ae (source 19 / image 108 purls; grype image 0C/58H) | 2026-10-27 |
+| Gate 1 ISSO SBOM accepted | waiting-gate | approver, date, message link | |
 | 3a Child: Security scan | running | https://devin-gtm.devinenterprise.com/sessions/5b840eca3ca046dda2fd3ebc28f901f4 (Security 2.0 + SonarQube ingest) | 2026-10-27 |
 | 3b Child: Compliance scans | running | https://devin-gtm.devinenterprise.com/sessions/ef48afef75b74f0f8a53366bb4fc19a3 | 2026-10-27 |
 | 4 Child: De-conflict + user selection | | 10-remediation-register.md, 12-remediation-scope.csv | |
