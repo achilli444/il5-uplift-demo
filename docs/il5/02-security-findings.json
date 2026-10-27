@@ -1,0 +1,242 @@
+[
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-2647d53325fa49519243f6d701ab8850",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "Seeded default account with a weak password",
+    "category": "auth-bypass",
+    "path": "app/db.py",
+    "line_start": 14,
+    "line_end": 14,
+    "related_locations": [
+      {
+        "path": "app/main.py",
+        "line_start": 44,
+        "line_end": 52
+      }
+    ],
+    "cwe": "CWE-1392",
+    "cwe_secondary": [
+      "CWE-521"
+    ],
+    "severity": {
+      "tool": "high",
+      "normalized": "high"
+    },
+    "tool_status": "new",
+    "tool_status_detail": "open",
+    "runtime_validated": false,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  },
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-5c7b7171e8674100a127abbe1fe0f9b5",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "SQL injection in asset lookup",
+    "category": "sql-injection",
+    "path": "app/db.py",
+    "line_start": 23,
+    "line_end": 26,
+    "related_locations": [
+      {
+        "path": "app/main.py",
+        "line_start": 62,
+        "line_end": 68
+      }
+    ],
+    "cwe": "CWE-89",
+    "cwe_secondary": [],
+    "severity": {
+      "tool": "high",
+      "normalized": "high"
+    },
+    "tool_status": "new",
+    "tool_status_detail": "open",
+    "runtime_validated": true,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  },
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-49728a99fc644ef1b6eb34b07fef5de8",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "Token signing secret committed in plaintext lets anyone with repo access forge login tokens",
+    "category": "secrets-exposure",
+    "path": "k8s/deployment.yaml",
+    "line_start": 19,
+    "line_end": 21,
+    "related_locations": [
+      {
+        "path": "app/settings.py",
+        "line_start": 5,
+        "line_end": 5
+      },
+      {
+        "path": "app/auth.py",
+        "line_start": 22,
+        "line_end": 32
+      }
+    ],
+    "cwe": "CWE-321",
+    "cwe_secondary": [
+      "CWE-798"
+    ],
+    "severity": {
+      "tool": "high",
+      "normalized": "high"
+    },
+    "tool_status": "new",
+    "tool_status_detail": "open",
+    "runtime_validated": false,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  },
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-26befe282e82415fa22f0a2c4b951d46",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "Hardcoded export API key gives anyone with repo access a full data dump",
+    "category": "secrets-exposure",
+    "path": "app/settings.py",
+    "line_start": 4,
+    "line_end": 4,
+    "related_locations": [
+      {
+        "path": "app/main.py",
+        "line_start": 71,
+        "line_end": 75
+      }
+    ],
+    "cwe": "CWE-798",
+    "cwe_secondary": [],
+    "severity": {
+      "tool": "medium",
+      "normalized": "medium"
+    },
+    "tool_status": "new",
+    "tool_status_detail": "open",
+    "runtime_validated": false,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  },
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-e7836101ac1942eeba8e1c0ebf22121b",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "Unsalted MD5 password hashes and tokens that never expire",
+    "category": "insecure-crypto",
+    "path": "app/auth.py",
+    "line_start": 10,
+    "line_end": 12,
+    "related_locations": [
+      {
+        "path": "app/auth.py",
+        "line_start": 15,
+        "line_end": 32
+      }
+    ],
+    "cwe": "CWE-916",
+    "cwe_secondary": [
+      "CWE-613"
+    ],
+    "severity": {
+      "tool": "low",
+      "normalized": "low"
+    },
+    "tool_status": "new",
+    "tool_status_detail": "open",
+    "runtime_validated": false,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  },
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-aacad442895f4e1fb57f6165c7e26f53",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "Stack traces and error text returned to clients",
+    "category": "other-info-disclosure",
+    "path": "app/main.py",
+    "line_start": 32,
+    "line_end": 35,
+    "related_locations": [],
+    "cwe": "CWE-209",
+    "cwe_secondary": [],
+    "severity": {
+      "tool": "low",
+      "normalized": "low"
+    },
+    "tool_status": "suppressed",
+    "tool_status_detail": "dismissed by the scan's own triage (not by this session): Dismissed as a verbose-error hygiene item. It does not give access to anything by itself. Its only security effect is that SQL error text helps shape injection payloads. The SQL injection finding (sfind-5c7b7171e8674100a127abbe1fe0f9b5) records that effect. The SI-11 / G5 gap is still tracked in the IL5 Remediation Register.",
+    "runtime_validated": false,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  },
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-3f4588d09080434c82dae59f9e9aa8a3",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "Login takes passwords in the URL, has no lockout, and audit lines can be forged",
+    "category": "other-logic-bug",
+    "path": "app/main.py",
+    "line_start": 44,
+    "line_end": 52,
+    "related_locations": [
+      {
+        "path": "app/main.py",
+        "line_start": 27,
+        "line_end": 29
+      }
+    ],
+    "cwe": "CWE-307",
+    "cwe_secondary": [
+      "CWE-598",
+      "CWE-117"
+    ],
+    "severity": {
+      "tool": "low",
+      "normalized": "low"
+    },
+    "tool_status": "new",
+    "tool_status_detail": "open",
+    "runtime_validated": false,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  },
+  {
+    "source": "devin-security",
+    "source_finding_id": "sfind-5041cbc2c178476cbb87355e2aea8eea",
+    "scan_id": "scan-87996f1a24b348bfa10fbfa16f74bb7f",
+    "repo": "achilli444/il5-uplift-demo",
+    "commit": "ce1f17954c161f7a445f26a88f17b6d2ee77fe98",
+    "title": "Container runs privileged as root",
+    "category": "other-insecure-container",
+    "path": "k8s/deployment.yaml",
+    "line_start": 15,
+    "line_end": 18,
+    "related_locations": [
+      {
+        "path": "Dockerfile",
+        "line_start": 1,
+        "line_end": 7
+      }
+    ],
+    "cwe": "CWE-250",
+    "cwe_secondary": [],
+    "severity": {
+      "tool": "low",
+      "normalized": "low"
+    },
+    "tool_status": "new",
+    "tool_status_detail": "open",
+    "runtime_validated": false,
+    "url": "https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f"
+  }
+]
