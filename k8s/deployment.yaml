@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mission-readiness-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: mrt}
+  template:
+    metadata:
+      labels: {app: mrt}
+    spec:
+      containers:
+        - name: mrt
+          image: registry.example.mil/mrt:latest      # G8: floating tag, not digest-pinned
+          securityContext:
+            privileged: true                           # G8: privileged container
+            runAsUser: 0
+          env:
+            - name: TOKEN_SECRET
+              value: "s3cr3t-in-plaintext"            # G8: secret in env
+          ports:
+            - containerPort: 8000
