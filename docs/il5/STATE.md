@@ -3,7 +3,7 @@
 | Step | Status (todo / running / waiting-gate / done) | Evidence / URLs | Updated |
 |---|---|---|---|
 | 1 Init + boundary | done | 00-boundary.md on il5/main; baseline main @ 977214f | 2026-10-27 |
-| 2 Child: SBOM | running | child URL, package path | 2026-10-27 |
+| 2 Child: SBOM | running | https://devin-gtm.devinenterprise.com/sessions/92802104a79942b2ba71f310cdfa439c -> docs/il5/evidence/sbom/ | 2026-10-27 |
 | Gate 1 ISSO SBOM accepted | | approver, date, message link | |
 | 3a Child: Security scan | | child URL, scan IDs, 02-security-summary.md | |
 | 3b Child: Compliance scans | | child URL, scan IDs, 03-compliance-summary.md | |
