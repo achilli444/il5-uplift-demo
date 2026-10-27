@@ -1,0 +1,743 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.69.3"
+  },
+  "ReportID": "01a17c8e-9b84-77d1-b2fb-003709d62ea9",
+  "CreatedAt": "2026-10-27T08:51:23.140513372Z",
+  "ArtifactName": "docs/il5/evidence/sbom/il5-uplift-demo_source_sbom_20261027_977214f.cdx.json",
+  "ArtifactType": "cyclonedx",
+  "Results": [
+    {
+      "Target": "Python",
+      "Class": "lang-pkgs",
+      "Type": "python-pkg",
+      "Packages": [
+        {
+          "ID": "annotated-types@0.8.0",
+          "Name": "annotated-types",
+          "Identifier": {
+            "PURL": "pkg:pypi/annotated-types@0.8.0",
+            "UID": "590ce03a7b88efe0",
+            "BOMRef": "pkg:pypi/annotated-types@0.8.0?package-id=86396e9020ba2f34"
+          },
+          "Version": "0.8.0"
+        },
+        {
+          "ID": "anyio@4.15.1",
+          "Name": "anyio",
+          "Identifier": {
+            "PURL": "pkg:pypi/anyio@4.15.1",
+            "UID": "9c9f4de7f2c9931a",
+            "BOMRef": "pkg:pypi/anyio@4.15.1?package-id=7ed6a0057790f6f0"
+          },
+          "Version": "4.15.1"
+        },
+        {
+          "ID": "certifi@2026.10.23",
+          "Name": "certifi",
+          "Identifier": {
+            "PURL": "pkg:pypi/certifi@2026.10.23",
+            "UID": "90d1825fcb8e51c0",
+            "BOMRef": "pkg:pypi/certifi@2026.10.23?package-id=1f0e4527d3a6c8df"
+          },
+          "Version": "2026.10.23"
+        },
+        {
+          "ID": "click@8.5.0",
+          "Name": "click",
+          "Identifier": {
+            "PURL": "pkg:pypi/click@8.5.0",
+            "UID": "58baca5a3060d9a6",
+            "BOMRef": "pkg:pypi/click@8.5.0?package-id=9f5923b3977b2040"
+          },
+          "Version": "8.5.0"
+        },
+        {
+          "ID": "fastapi@0.115.6",
+          "Name": "fastapi",
+          "Identifier": {
+            "PURL": "pkg:pypi/fastapi@0.115.6",
+            "UID": "e143f5b82c9eac84",
+            "BOMRef": "pkg:pypi/fastapi@0.115.6?package-id=a7afacadfe572b18"
+          },
+          "Version": "0.115.6"
+        },
+        {
+          "ID": "fastapi@0.115.6",
+          "Name": "fastapi",
+          "Identifier": {
+            "PURL": "pkg:pypi/fastapi@0.115.6",
+            "UID": "62f1a030407b7f08",
+            "BOMRef": "pkg:pypi/fastapi@0.115.6?package-id=7f73ff35fd53ead2"
+          },
+          "Version": "0.115.6"
+        },
+        {
+          "ID": "h11@0.16.0",
+          "Name": "h11",
+          "Identifier": {
+            "PURL": "pkg:pypi/h11@0.16.0",
+            "UID": "ae4d6c981d8fc0ad",
+            "BOMRef": "pkg:pypi/h11@0.16.0?package-id=9029fc736570c5f1"
+          },
+          "Version": "0.16.0"
+        },
+        {
+          "ID": "httpcore@1.0.9",
+          "Name": "httpcore",
+          "Identifier": {
+            "PURL": "pkg:pypi/httpcore@1.0.9",
+            "UID": "e4c74b2c55a61a5f",
+            "BOMRef": "pkg:pypi/httpcore@1.0.9?package-id=f792231ee9d872e6"
+          },
+          "Version": "1.0.9"
+        },
+        {
+          "ID": "httpx@0.28.1",
+          "Name": "httpx",
+          "Identifier": {
+            "PURL": "pkg:pypi/httpx@0.28.1",
+            "UID": "90372f115fae2ac2",
+            "BOMRef": "pkg:pypi/httpx@0.28.1?package-id=48bb1127a633dbe1"
+          },
+          "Version": "0.28.1"
+        },
+        {
+          "ID": "httpx@0.28.1",
+          "Name": "httpx",
+          "Identifier": {
+            "PURL": "pkg:pypi/httpx@0.28.1",
+            "UID": "6c7ab3c24135b06e",
+            "BOMRef": "pkg:pypi/httpx@0.28.1?package-id=fef47d67f9512fca"
+          },
+          "Version": "0.28.1"
+        },
+        {
+          "ID": "idna@3.20",
+          "Name": "idna",
+          "Identifier": {
+            "PURL": "pkg:pypi/idna@3.20",
+            "UID": "d5b5e219bb42aef0",
+            "BOMRef": "pkg:pypi/idna@3.20?package-id=7036c8599b804445"
+          },
+          "Version": "3.20"
+        },
+        {
+          "ID": "iniconfig@2.3.1",
+          "Name": "iniconfig",
+          "Identifier": {
+            "PURL": "pkg:pypi/iniconfig@2.3.1",
+            "UID": "5b06d4ee2c2b1beb",
+            "BOMRef": "pkg:pypi/iniconfig@2.3.1?package-id=97a96af89cb3c0da"
+          },
+          "Version": "2.3.1"
+        },
+        {
+          "ID": "packaging@26.3",
+          "Name": "packaging",
+          "Identifier": {
+            "PURL": "pkg:pypi/packaging@26.3",
+            "UID": "42204e50672c793d",
+            "BOMRef": "pkg:pypi/packaging@26.3?package-id=2213b24b03e6e625"
+          },
+          "Version": "26.3"
+        },
+        {
+          "ID": "pluggy@1.7.0",
+          "Name": "pluggy",
+          "Identifier": {
+            "PURL": "pkg:pypi/pluggy@1.7.0",
+            "UID": "ff122f75bbd317c5",
+            "BOMRef": "pkg:pypi/pluggy@1.7.0?package-id=7365927dfe5259d1"
+          },
+          "Version": "1.7.0"
+        },
+        {
+          "ID": "pydantic@2.14.1",
+          "Name": "pydantic",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic@2.14.1",
+            "UID": "f6fa71b697ebb718",
+            "BOMRef": "pkg:pypi/pydantic@2.14.1?package-id=b9cd3b115974c8fa"
+          },
+          "Version": "2.14.1"
+        },
+        {
+          "ID": "pydantic-core@2.50.1",
+          "Name": "pydantic-core",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic-core@2.50.1",
+            "UID": "643f58f608ebd154",
+            "BOMRef": "pkg:pypi/pydantic-core@2.50.1?package-id=644d3ffdb62e5035"
+          },
+          "Version": "2.50.1"
+        },
+        {
+          "ID": "pytest@8.3.4",
+          "Name": "pytest",
+          "Identifier": {
+            "PURL": "pkg:pypi/pytest@8.3.4",
+            "UID": "eaf18a09851c25b1",
+            "BOMRef": "pkg:pypi/pytest@8.3.4?package-id=c0c910cc0b83d8fd"
+          },
+          "Version": "8.3.4"
+        },
+        {
+          "ID": "pytest@8.3.4",
+          "Name": "pytest",
+          "Identifier": {
+            "PURL": "pkg:pypi/pytest@8.3.4",
+            "UID": "94f4886c99c7bb51",
+            "BOMRef": "pkg:pypi/pytest@8.3.4?package-id=109ef978dabbb16a"
+          },
+          "Version": "8.3.4"
+        },
+        {
+          "ID": "starlette@0.41.3",
+          "Name": "starlette",
+          "Identifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "Version": "0.41.3"
+        },
+        {
+          "ID": "typing-extensions@4.16.0",
+          "Name": "typing-extensions",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-extensions@4.16.0",
+            "UID": "4f636b608131ed94",
+            "BOMRef": "pkg:pypi/typing-extensions@4.16.0?package-id=88f39a605fa79b0c"
+          },
+          "Version": "4.16.0"
+        },
+        {
+          "ID": "typing-inspection@0.4.4",
+          "Name": "typing-inspection",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-inspection@0.4.4",
+            "UID": "331e286365d1b408",
+            "BOMRef": "pkg:pypi/typing-inspection@0.4.4?package-id=4d96d0b930674221"
+          },
+          "Version": "0.4.4"
+        },
+        {
+          "ID": "uvicorn@0.32.1",
+          "Name": "uvicorn",
+          "Identifier": {
+            "PURL": "pkg:pypi/uvicorn@0.32.1",
+            "UID": "7a8d7a735771708d",
+            "BOMRef": "pkg:pypi/uvicorn@0.32.1?package-id=fac2bccace5e7e93"
+          },
+          "Version": "0.32.1"
+        },
+        {
+          "ID": "uvicorn@0.32.1",
+          "Name": "uvicorn",
+          "Identifier": {
+            "PURL": "pkg:pypi/uvicorn@0.32.1",
+            "UID": "a9fad2989e738e58",
+            "BOMRef": "pkg:pypi/uvicorn@0.32.1?package-id=6f8d03c3dfba64b7"
+          },
+          "Version": "0.32.1"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2025-71176",
+          "VendorIDs": [
+            "GHSA-6w46-j5rx-g56g"
+          ],
+          "PkgID": "pytest@8.3.4",
+          "PkgName": "pytest",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/pytest@8.3.4",
+            "UID": "eaf18a09851c25b1",
+            "BOMRef": "pkg:pypi/pytest@8.3.4?package-id=c0c910cc0b83d8fd"
+          },
+          "InstalledVersion": "8.3.4",
+          "FixedVersion": "9.0.3",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-71176",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:60ea04eb96954984707a22635596ccdf1c343d992e5e47eb83c61ec2e7a65253",
+          "Title": "pytest: pytest: Denial of Service or Privilege Escalation via insecure temporary directory handling",
+          "Description": "pytest through 9.0.2 on UNIX relies on directories with the /tmp/pytest-of-{user} name pattern, which allows local users to cause a denial of service or possibly gain privileges.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-379"
+          ],
+          "VendorSeverity": {
+            "amazon": 2,
+            "ghsa": 2,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:L",
+              "V3Score": 6.8
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:L",
+              "V3Score": 6.8
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2025-71176",
+            "https://advisory.echohq.com/cve/CVE-2025-71176",
+            "https://github.com/pytest-dev/pytes",
+            "https://github.com/pytest-dev/pytest/commit/95d8423bd24992deea5b9df32555fa1741679e2c",
+            "https://github.com/pytest-dev/pytest/issues/13669",
+            "https://github.com/pytest-dev/pytest/pull/14343",
+            "https://github.com/pytest-dev/pytest/releases/tag/9.0.3",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-71176",
+            "https://www.cve.org/CVERecord?id=CVE-2025-71176",
+            "https://www.openwall.com/lists/oss-security/2026/01/21/5"
+          ],
+          "PublishedDate": "2026-01-22T05:16:17.577Z",
+          "LastModifiedDate": "2026-06-17T10:03:47.83Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-62727",
+          "VendorIDs": [
+            "GHSA-7f5h-v6xp-fcq8"
+          ],
+          "PkgID": "starlette@0.41.3",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "InstalledVersion": "0.41.3",
+          "FixedVersion": "0.49.1",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-62727",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:7cbbc8f8972ed4da396d77c69336fcf582fe7165f0553e0704ce06f666ed94bd",
+          "Title": "starlette: Starlette DoS via Range header merging",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. Starting in version 0.39.0 and prior to version 0.49.1 , an unauthenticated attacker can send a crafted HTTP Range header that triggers quadratic-time processing in Starlette's FileResponse Range parsing/merging logic. This enables CPU exhaustion per request, causing denial‑of‑service for endpoints serving files (e.g., StaticFiles or any use of FileResponse). This vulnerability is fixed in 0.49.1.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-407"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2025-62727",
+            "https://advisory.echohq.com/cve/CVE-2025-62727",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/commit/4ea6e22b489ec388d6004cfbca52dd5b147127c5",
+            "https://github.com/Kludex/starlette/commit/69ed26a85956ef4bd0161807eb27abf49be7cd3c",
+            "https://github.com/Kludex/starlette/releases/tag/0.49.1",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-7f5h-v6xp-fcq8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-62727",
+            "https://www.cve.org/CVERecord?id=CVE-2025-62727"
+          ],
+          "PublishedDate": "2025-10-28T21:15:40.447Z",
+          "LastModifiedDate": "2026-10-08T11:10:00.25Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-48818",
+          "VendorIDs": [
+            "GHSA-wqp7-x3pw-xc5r"
+          ],
+          "PkgID": "starlette@0.41.3",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "InstalledVersion": "0.41.3",
+          "FixedVersion": "1.1.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-48818",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:e40116340379d60a64074bfe12bc75de07a7a6a0b2e21a393bc0c1a51eafbec0",
+          "Title": "starlette: Starlette: SSRF and NTLM credential theft via UNC paths in StaticFiles on Windows",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. In versions 1.0.1 and earlier, StaticFiles on Windows is vulnerable to SSRF. An UNC path such as \\\\attacker.com\\share can cause os.path.realpath to initiate an outbound SMB connection before the path is rejected, exposing the service account’s NTLMv2 credentials for offline cracking or relay even though the HTTP response is only a 404. The issue affects default follow_symlink=False deployments, including frameworks built on Starlette such as FastAPI; POSIX systems and follow_symlink=True are unaffected. The issue is fixed in 1.1.0.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-918"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:30087",
+            "https://access.redhat.com/errata/RHSA-2026:30088",
+            "https://access.redhat.com/errata/RHSA-2026:30089",
+            "https://access.redhat.com/security/cve/CVE-2026-48818",
+            "https://advisory.echohq.com/cve/CVE-2026-48818",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2490020",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/commit/fd53168a7767b6b55ba5af787fd88f49e33cabc5",
+            "https://github.com/Kludex/starlette/pull/3287",
+            "https://github.com/Kludex/starlette/releases/tag/1.1.0",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-wqp7-x3pw-xc5r",
+            "https://github.com/pypa/advisory-database/tree/main/vulns/starlette/PYSEC-2026-2281.yaml",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-48818",
+            "https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-48818.json",
+            "https://www.cve.org/CVERecord?id=CVE-2026-48818"
+          ],
+          "PublishedDate": "2026-06-17T19:18:09.807Z",
+          "LastModifiedDate": "2026-10-26T11:10:00.157Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-54283",
+          "VendorIDs": [
+            "GHSA-82w8-qh3p-5jfq"
+          ],
+          "PkgID": "starlette@0.41.3",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "InstalledVersion": "0.41.3",
+          "FixedVersion": "1.3.1",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54283",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:415916f3253ccdc2477ecad9ff5340a1a2eb6dccc6708fe1016b2d194cbb60b2",
+          "Title": "starlette: Starlette: request.form() limits silently ignored for application/x-www-form-urlencoded enable DoS",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. From 0.4.1 until 1.3.1, request.form() accepts max_fields and max_part_size to bound resource consumption while parsing form data. These limits are enforced for multipart/form-data, but silently ignored for application/x-www-form-urlencoded. An unauthenticated attacker can therefore send a urlencoded body with an arbitrarily large number of fields or an arbitrarily large field, even when the application configured limits it believed would apply. This vulnerability is fixed in 1.3.1.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-54283",
+            "https://advisory.echohq.com/cve/CVE-2026-54283",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-82w8-qh3p-5jfq",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-54283",
+            "https://www.cve.org/CVERecord?id=CVE-2026-54283"
+          ],
+          "PublishedDate": "2026-06-22T18:16:46.943Z",
+          "LastModifiedDate": "2026-10-25T23:10:00.167Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-54121",
+          "VendorIDs": [
+            "GHSA-2c2j-9gv5-cj73"
+          ],
+          "PkgID": "starlette@0.41.3",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "InstalledVersion": "0.41.3",
+          "FixedVersion": "0.47.2",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-54121",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:a891b3c20b23692979bc6f91da1881eeceefcb2bf24ad3e48ba9848d0181a832",
+          "Title": "starlette: Starlette denial-of-service",
+          "Description": "Starlette is a lightweight ASGI (Asynchronous Server Gateway Interface) framework/toolkit, designed for building async web services in Python. In versions 0.47.1 and below, when parsing a multi-part form with large files (greater than the default max spool size) starlette will block the main thread to roll the file over to disk. This blocks the event thread which means the application can't accept new connections. The UploadFile code has a minor bug where instead of just checking for self._in_memory, the logic should also check if the additional bytes will cause a rollover. The vulnerability is fixed in version 0.47.2.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 2,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+              "V3Score": 5.3
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2025-54121",
+            "https://github.com/encode/starlette",
+            "https://github.com/encode/starlette/blob/fa5355442753f794965ae1af0f87f9fec1b9a3de/starlette/datastructures.py#L436C5-L447C14",
+            "https://github.com/encode/starlette/commit/9f7ec2eb512fcc3fe90b43cb9dd9e1d08696bec1",
+            "https://github.com/encode/starlette/discussions/2927#discussioncomment-13721403",
+            "https://github.com/encode/starlette/security/advisories/GHSA-2c2j-9gv5-cj73",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-54121",
+            "https://www.cve.org/CVERecord?id=CVE-2025-54121"
+          ],
+          "PublishedDate": "2025-07-21T20:15:41.827Z",
+          "LastModifiedDate": "2026-06-17T09:39:29.22Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-48710",
+          "VendorIDs": [
+            "GHSA-86qp-5c8j-p5mr"
+          ],
+          "PkgID": "starlette@0.41.3",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "InstalledVersion": "0.41.3",
+          "FixedVersion": "1.0.1",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-48710",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9d23db6b128d0a7691d7b2c5833bd6eb53ddbf129461bc5307768bda0eddb161",
+          "Title": "starlette: Starlette: Security restriction bypass via malformed HTTP Host header",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. Prior to version 1.0.1, the HTTP `Host` request header was not validated before being used to reconstruct `request.url`. Because the routing algorithm relies on the raw HTTP path while `request.url` is rebuilt from the `Host` header, a malformed header could make `request.url.path` differ from the path that was actually requested. Middleware and endpoints that apply security restrictions based on `request.url` (rather than the raw `scope` path) could therefore be bypassed. Users should upgrade to a version greater than or equal to version 1.0.1, which validates the `Host` header against the grammar of RFC 9112 §3.2 / RFC 3986 §3.2.2 when constructing `request.url` and falls back to `scope[\"server\"]` for malformed values.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-444",
+            "CWE-1289"
+          ],
+          "VendorSeverity": {
+            "ghsa": 2,
+            "nvd": 2,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "V3Score": 6.5
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "V3Score": 6.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "V3Score": 6.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:22992",
+            "https://access.redhat.com/errata/RHSA-2026:22993",
+            "https://access.redhat.com/errata/RHSA-2026:23346",
+            "https://access.redhat.com/errata/RHSA-2026:24866",
+            "https://access.redhat.com/errata/RHSA-2026:26226",
+            "https://access.redhat.com/errata/RHSA-2026:30088",
+            "https://access.redhat.com/errata/RHSA-2026:30089",
+            "https://access.redhat.com/errata/RHSA-2026:34456",
+            "https://access.redhat.com/errata/RHSA-2026:34526",
+            "https://access.redhat.com/errata/RHSA-2026:34532",
+            "https://access.redhat.com/errata/RHSA-2026:37275",
+            "https://access.redhat.com/errata/RHSA-2026:43038",
+            "https://access.redhat.com/errata/RHSA-2026:44696",
+            "https://access.redhat.com/errata/RHSA-2026:51357",
+            "https://access.redhat.com/errata/RHSA-2026:60520",
+            "https://access.redhat.com/errata/RHSA-2026:63337",
+            "https://access.redhat.com/security/cve/CVE-2026-48710",
+            "https://advisory.echohq.com/cve/CVE-2026-48710",
+            "https://badhost.org",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2481742",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/commit/764dab0dcfb9033d75442d7a359645c9f94648c6",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-86qp-5c8j-p5mr",
+            "https://github.com/pypa/advisory-database/tree/main/vulns/starlette/PYSEC-2026-161.yaml",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-48710",
+            "https://ostif.org/disclosing-the-badhost-vulnerability-in-starlette",
+            "https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-48710.json",
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+            "https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=CVE-2026-48710",
+            "https://www.cve.org/CVERecord?id=CVE-2026-48710",
+            "https://www.secwest.net/starlette",
+            "https://www.wiz.io/blog/ai-infrastructure-honeypot",
+            "https://www.x41-dsec.de/lab/advisories/x41-2026-002-starlette",
+            "https:/www.microsoft.com/en-us/security/blog/2026/08/26/when-ai-infrastructure-becomes-target-securing-gateways-control-points"
+          ],
+          "PublishedDate": "2026-05-26T22:16:44.02Z",
+          "LastModifiedDate": "2026-10-01T18:17:18.153Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-48817",
+          "VendorIDs": [
+            "GHSA-x746-7m8f-x49c"
+          ],
+          "PkgID": "starlette@0.41.3",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "InstalledVersion": "0.41.3",
+          "FixedVersion": "1.1.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-48817",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:2a23f23367f0a8038f1696cc346afa82af352a31a5c4e00e395b45b9413c6df9",
+          "Title": "starlette: Starlette: Information disclosure and unintended method execution via non-standard HTTP methods",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. In versions 1.0.1 and below, when dispatching a request, HTTPEndpoint selects the handler by lowercasing the HTTP method and looking it up as an attribute with getattr, without restricting the lookup to a known set of HTTP verbs. When an HTTPEndpoint subclass is registered through Route(...) without an explicit methods= argument, the route does not constrain the method and every method reaches the endpoint. If a non-standard HTTP method whose lowercased name matches an attribute on the endpoint subclass reaches the endpoint, that attribute is invoked as if it were a request handler. An attacker can use this to reach methods that were never meant to be HTTP handlers, such as internal helpers, without the authorization checks applied by the intended public handler. An application (including Starlette-based frameworks like FastAPI) is affected if it registers an HTTPEndpoint subclass via Route(...) without explicitly setting methods=, and that subclass includes extra methods named like non-standard HTTP verbs that take one request argument and return a response. This issue has been fixed in version 1.1.0.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-470"
+          ],
+          "VendorSeverity": {
+            "ghsa": 2,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "V3Score": 5.3
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-48817",
+            "https://advisory.echohq.com/cve/CVE-2026-48817",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/releases/tag/1.1.0",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-x746-7m8f-x49c",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-48817",
+            "https://www.cve.org/CVERecord?id=CVE-2026-48817"
+          ],
+          "PublishedDate": "2026-06-17T20:17:22.427Z",
+          "LastModifiedDate": "2026-10-25T23:10:00.167Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-54282",
+          "VendorIDs": [
+            "GHSA-jp82-jpqv-5vv3"
+          ],
+          "PkgID": "starlette@0.41.3",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.41.3",
+            "UID": "bd17f4502e7dda22",
+            "BOMRef": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+          },
+          "InstalledVersion": "0.41.3",
+          "FixedVersion": "1.3.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-54282",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:b040221d6dc9a37d0621dcf0f45ef46b4422287d1d77c81114d597ad155b42fa",
+          "Title": "starlette: Starlette: Information disclosure due to improper HTTP request path validation",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. Prior to 1.3.0, the HTTP request path is not validated before being used to reconstruct request.url. Because request.url is rebuilt by concatenating {scheme}://{host}{path} and re-parsing the result, a path that does not begin with / (for example @google.com) moves the authority boundary during re-parsing, so request.url.hostname and request.url.netloc become attacker-controlled. Code that reads request.url.hostname (rather than the Host header or scope) can therefore be misled into trusting an attacker-supplied host. This vulnerability is fixed in 1.3.0.",
+          "Severity": "LOW",
+          "CweIDs": [
+            "CWE-706"
+          ],
+          "VendorSeverity": {
+            "ghsa": 1,
+            "nvd": 2,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "V3Score": 3.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "V3Score": 5.3
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "V3Score": 4.8
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-54282",
+            "https://advisory.echohq.com/cve/CVE-2026-54282",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-jp82-jpqv-5vv3",
+            "https://github.com/pypa/advisory-database/tree/main/vulns/starlette/PYSEC-2026-248.yaml",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-54282",
+            "https://www.cve.org/CVERecord?id=CVE-2026-54282"
+          ],
+          "PublishedDate": "2026-06-22T18:16:46.807Z",
+          "LastModifiedDate": "2026-10-25T23:10:00.167Z"
+        }
+      ]
+    }
+  ]
+}

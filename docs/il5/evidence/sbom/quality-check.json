@@ -1,0 +1,940 @@
+{
+  "source": {
+    "cyclonedx_version": "1.6",
+    "spdx_version": "SPDX-2.3",
+    "serial_number_set": true,
+    "metadata_component": "il5-uplift-demo-source",
+    "dependency_graph_entries": 0,
+    "packages_missing_purl": [],
+    "files_without_purl": 2,
+    "unknown_supplier_percent_packages": 100.0,
+    "unknown_supplier_packages": [
+      {
+        "name": "annotated-types",
+        "version": "0.8.0",
+        "ref": "pkg:pypi/annotated-types@0.8.0?package-id=86396e9020ba2f34"
+      },
+      {
+        "name": "anyio",
+        "version": "4.15.1",
+        "ref": "pkg:pypi/anyio@4.15.1?package-id=7ed6a0057790f6f0"
+      },
+      {
+        "name": "certifi",
+        "version": "2026.10.23",
+        "ref": "pkg:pypi/certifi@2026.10.23?package-id=1f0e4527d3a6c8df"
+      },
+      {
+        "name": "click",
+        "version": "8.5.0",
+        "ref": "pkg:pypi/click@8.5.0?package-id=9f5923b3977b2040"
+      },
+      {
+        "name": "fastapi",
+        "version": "0.115.6",
+        "ref": "pkg:pypi/fastapi@0.115.6?package-id=7f73ff35fd53ead2"
+      },
+      {
+        "name": "fastapi",
+        "version": "0.115.6",
+        "ref": "pkg:pypi/fastapi@0.115.6?package-id=a7afacadfe572b18"
+      },
+      {
+        "name": "h11",
+        "version": "0.16.0",
+        "ref": "pkg:pypi/h11@0.16.0?package-id=9029fc736570c5f1"
+      },
+      {
+        "name": "httpcore",
+        "version": "1.0.9",
+        "ref": "pkg:pypi/httpcore@1.0.9?package-id=f792231ee9d872e6"
+      },
+      {
+        "name": "httpx",
+        "version": "0.28.1",
+        "ref": "pkg:pypi/httpx@0.28.1?package-id=fef47d67f9512fca"
+      },
+      {
+        "name": "httpx",
+        "version": "0.28.1",
+        "ref": "pkg:pypi/httpx@0.28.1?package-id=48bb1127a633dbe1"
+      },
+      {
+        "name": "idna",
+        "version": "3.20",
+        "ref": "pkg:pypi/idna@3.20?package-id=7036c8599b804445"
+      },
+      {
+        "name": "iniconfig",
+        "version": "2.3.1",
+        "ref": "pkg:pypi/iniconfig@2.3.1?package-id=97a96af89cb3c0da"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3",
+        "ref": "pkg:pypi/packaging@26.3?package-id=2213b24b03e6e625"
+      },
+      {
+        "name": "pluggy",
+        "version": "1.7.0",
+        "ref": "pkg:pypi/pluggy@1.7.0?package-id=7365927dfe5259d1"
+      },
+      {
+        "name": "pydantic",
+        "version": "2.14.1",
+        "ref": "pkg:pypi/pydantic@2.14.1?package-id=b9cd3b115974c8fa"
+      },
+      {
+        "name": "pydantic-core",
+        "version": "2.50.1",
+        "ref": "pkg:pypi/pydantic-core@2.50.1?package-id=644d3ffdb62e5035"
+      },
+      {
+        "name": "pytest",
+        "version": "8.3.4",
+        "ref": "pkg:pypi/pytest@8.3.4?package-id=c0c910cc0b83d8fd"
+      },
+      {
+        "name": "pytest",
+        "version": "8.3.4",
+        "ref": "pkg:pypi/pytest@8.3.4?package-id=109ef978dabbb16a"
+      },
+      {
+        "name": "starlette",
+        "version": "0.41.3",
+        "ref": "pkg:pypi/starlette@0.41.3?package-id=dc857fe6a49a7d1d"
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.16.0",
+        "ref": "pkg:pypi/typing-extensions@4.16.0?package-id=88f39a605fa79b0c"
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.4",
+        "ref": "pkg:pypi/typing-inspection@0.4.4?package-id=4d96d0b930674221"
+      },
+      {
+        "name": "uvicorn",
+        "version": "0.32.1",
+        "ref": "pkg:pypi/uvicorn@0.32.1?package-id=6f8d03c3dfba64b7"
+      },
+      {
+        "name": "uvicorn",
+        "version": "0.32.1",
+        "ref": "pkg:pypi/uvicorn@0.32.1?package-id=fac2bccace5e7e93"
+      }
+    ]
+  },
+  "image": {
+    "cyclonedx_version": "1.6",
+    "spdx_version": "SPDX-2.3",
+    "serial_number_set": true,
+    "metadata_component": "il5-uplift-demo-image",
+    "dependency_graph_entries": 88,
+    "packages_missing_purl": [
+      {
+        "bom-ref": "3fab729c892a8d06",
+        "type": "application",
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "cpe": "cpe:2.3:a:Simple_Launcher:Simple_Launcher:1.1.0.14:*:*:*:*:*:*:*",
+        "properties": [
+          {
+            "name": "syft:package:foundBy",
+            "value": "pe-binary-package-cataloger"
+          },
+          {
+            "name": "syft:package:type",
+            "value": "binary"
+          },
+          {
+            "name": "syft:package:metadataType",
+            "value": "pe-binary"
+          },
+          {
+            "name": "syft:location:0:layerID",
+            "value": "sha256:d0240b53eb0169db59a6fc2e9b65823e17ee303ce553be997d001569fb849369"
+          },
+          {
+            "name": "syft:location:0:path",
+            "value": "/usr/local/lib/python3.12/site-packages/pip/_vendor/distlib/t32.exe"
+          }
+        ]
+      },
+      {
+        "bom-ref": "92d6c6b9cc734385",
+        "type": "application",
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "cpe": "cpe:2.3:a:Simple_Launcher:Simple_Launcher:1.1.0.14:*:*:*:*:*:*:*",
+        "properties": [
+          {
+            "name": "syft:package:foundBy",
+            "value": "pe-binary-package-cataloger"
+          },
+          {
+            "name": "syft:package:type",
+            "value": "binary"
+          },
+          {
+            "name": "syft:package:metadataType",
+            "value": "pe-binary"
+          },
+          {
+            "name": "syft:location:0:layerID",
+            "value": "sha256:d0240b53eb0169db59a6fc2e9b65823e17ee303ce553be997d001569fb849369"
+          },
+          {
+            "name": "syft:location:0:path",
+            "value": "/usr/local/lib/python3.12/site-packages/pip/_vendor/distlib/t64-arm.exe"
+          }
+        ]
+      },
+      {
+        "bom-ref": "b20651ec88338dcf",
+        "type": "application",
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "cpe": "cpe:2.3:a:Simple_Launcher:Simple_Launcher:1.1.0.14:*:*:*:*:*:*:*",
+        "properties": [
+          {
+            "name": "syft:package:foundBy",
+            "value": "pe-binary-package-cataloger"
+          },
+          {
+            "name": "syft:package:type",
+            "value": "binary"
+          },
+          {
+            "name": "syft:package:metadataType",
+            "value": "pe-binary"
+          },
+          {
+            "name": "syft:location:0:layerID",
+            "value": "sha256:d0240b53eb0169db59a6fc2e9b65823e17ee303ce553be997d001569fb849369"
+          },
+          {
+            "name": "syft:location:0:path",
+            "value": "/usr/local/lib/python3.12/site-packages/pip/_vendor/distlib/t64.exe"
+          }
+        ]
+      },
+      {
+        "bom-ref": "e718ab0312f6596a",
+        "type": "application",
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "cpe": "cpe:2.3:a:Simple_Launcher:Simple_Launcher:1.1.0.14:*:*:*:*:*:*:*",
+        "properties": [
+          {
+            "name": "syft:package:foundBy",
+            "value": "pe-binary-package-cataloger"
+          },
+          {
+            "name": "syft:package:type",
+            "value": "binary"
+          },
+          {
+            "name": "syft:package:metadataType",
+            "value": "pe-binary"
+          },
+          {
+            "name": "syft:location:0:layerID",
+            "value": "sha256:d0240b53eb0169db59a6fc2e9b65823e17ee303ce553be997d001569fb849369"
+          },
+          {
+            "name": "syft:location:0:path",
+            "value": "/usr/local/lib/python3.12/site-packages/pip/_vendor/distlib/w32.exe"
+          }
+        ]
+      },
+      {
+        "bom-ref": "0caa39142c9cb516",
+        "type": "application",
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "cpe": "cpe:2.3:a:Simple_Launcher:Simple_Launcher:1.1.0.14:*:*:*:*:*:*:*",
+        "properties": [
+          {
+            "name": "syft:package:foundBy",
+            "value": "pe-binary-package-cataloger"
+          },
+          {
+            "name": "syft:package:type",
+            "value": "binary"
+          },
+          {
+            "name": "syft:package:metadataType",
+            "value": "pe-binary"
+          },
+          {
+            "name": "syft:location:0:layerID",
+            "value": "sha256:d0240b53eb0169db59a6fc2e9b65823e17ee303ce553be997d001569fb849369"
+          },
+          {
+            "name": "syft:location:0:path",
+            "value": "/usr/local/lib/python3.12/site-packages/pip/_vendor/distlib/w64-arm.exe"
+          }
+        ]
+      },
+      {
+        "bom-ref": "175787fc43f2b447",
+        "type": "application",
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "cpe": "cpe:2.3:a:Simple_Launcher:Simple_Launcher:1.1.0.14:*:*:*:*:*:*:*",
+        "properties": [
+          {
+            "name": "syft:package:foundBy",
+            "value": "pe-binary-package-cataloger"
+          },
+          {
+            "name": "syft:package:type",
+            "value": "binary"
+          },
+          {
+            "name": "syft:package:metadataType",
+            "value": "pe-binary"
+          },
+          {
+            "name": "syft:location:0:layerID",
+            "value": "sha256:d0240b53eb0169db59a6fc2e9b65823e17ee303ce553be997d001569fb849369"
+          },
+          {
+            "name": "syft:location:0:path",
+            "value": "/usr/local/lib/python3.12/site-packages/pip/_vendor/distlib/w64.exe"
+          }
+        ]
+      },
+      {
+        "bom-ref": "os:debian@13.7",
+        "type": "operating-system",
+        "name": "debian",
+        "version": "13.7",
+        "description": "Debian GNU/Linux 13 (trixie)",
+        "swid": {
+          "tagId": "debian",
+          "name": "debian",
+          "version": "13.7"
+        },
+        "externalReferences": [
+          {
+            "url": "https://bugs.debian.org/",
+            "type": "issue-tracker"
+          },
+          {
+            "url": "https://www.debian.org/",
+            "type": "website"
+          },
+          {
+            "url": "https://www.debian.org/support",
+            "comment": "support",
+            "type": "other"
+          }
+        ],
+        "properties": [
+          {
+            "name": "syft:distro:extendedSupport",
+            "value": "false"
+          },
+          {
+            "name": "syft:distro:id",
+            "value": "debian"
+          },
+          {
+            "name": "syft:distro:prettyName",
+            "value": "Debian GNU/Linux 13 (trixie)"
+          },
+          {
+            "name": "syft:distro:versionCodename",
+            "value": "trixie"
+          },
+          {
+            "name": "syft:distro:versionID",
+            "value": "13.7"
+          }
+        ]
+      }
+    ],
+    "files_without_purl": 2703,
+    "unknown_supplier_percent_packages": 100.0,
+    "unknown_supplier_packages": [
+      {
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "ref": "3fab729c892a8d06"
+      },
+      {
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "ref": "92d6c6b9cc734385"
+      },
+      {
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "ref": "b20651ec88338dcf"
+      },
+      {
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "ref": "e718ab0312f6596a"
+      },
+      {
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "ref": "0caa39142c9cb516"
+      },
+      {
+        "name": "Simple Launcher",
+        "version": "1.1.0.14",
+        "ref": "175787fc43f2b447"
+      },
+      {
+        "name": "adduser",
+        "version": "3.152",
+        "ref": "pkg:deb/debian/adduser@3.152?arch=all&distro=debian-13.7&package-id=3d43575450a8f3e7"
+      },
+      {
+        "name": "annotated-types",
+        "version": "0.8.0",
+        "ref": "pkg:pypi/annotated-types@0.8.0?package-id=599a691c1b1d618c"
+      },
+      {
+        "name": "anyio",
+        "version": "4.15.1",
+        "ref": "pkg:pypi/anyio@4.15.1?package-id=32e8fef2dbfc60ad"
+      },
+      {
+        "name": "apt",
+        "version": "3.0.3",
+        "ref": "pkg:deb/debian/apt@3.0.3?arch=amd64&distro=debian-13.7&package-id=0ea1a43670a5d18e"
+      },
+      {
+        "name": "base-files",
+        "version": "13.8+deb13u7",
+        "ref": "pkg:deb/debian/base-files@13.8%2Bdeb13u7?arch=amd64&distro=debian-13.7&package-id=c8ecd01ade3f20ec"
+      },
+      {
+        "name": "base-passwd",
+        "version": "3.6.7",
+        "ref": "pkg:deb/debian/base-passwd@3.6.7?arch=amd64&distro=debian-13.7&package-id=44aca50e14654da9"
+      },
+      {
+        "name": "bash",
+        "version": "5.2.37-2+b10",
+        "ref": "pkg:deb/debian/bash@5.2.37-2%2Bb10?arch=amd64&distro=debian-13.7&package-id=1f08d921bacf17ec&upstream=bash%405.2.37-2"
+      },
+      {
+        "name": "bsdutils",
+        "version": "1:2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/bsdutils@1%3A2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=f5152615a12aeb3d&upstream=util-linux%402.41.5-0%2Bdeb13u1"
+      },
+      {
+        "name": "ca-certificates",
+        "version": "20250419+deb13u1",
+        "ref": "pkg:deb/debian/ca-certificates@20250419%2Bdeb13u1?arch=all&distro=debian-13.7&package-id=1ee747125f437b80"
+      },
+      {
+        "name": "certifi",
+        "version": "2026.10.23",
+        "ref": "pkg:pypi/certifi@2026.10.23?package-id=75c84cfc79173c4b"
+      },
+      {
+        "name": "click",
+        "version": "8.5.0",
+        "ref": "pkg:pypi/click@8.5.0?package-id=beceec9912250a48"
+      },
+      {
+        "name": "coreutils",
+        "version": "9.7-3",
+        "ref": "pkg:deb/debian/coreutils@9.7-3?arch=amd64&distro=debian-13.7&package-id=2f8436d480a75c8c"
+      },
+      {
+        "name": "dash",
+        "version": "0.5.12-12",
+        "ref": "pkg:deb/debian/dash@0.5.12-12?arch=amd64&distro=debian-13.7&package-id=e919b2d690c3a4f3"
+      },
+      {
+        "name": "debconf",
+        "version": "1.5.91",
+        "ref": "pkg:deb/debian/debconf@1.5.91?arch=all&distro=debian-13.7&package-id=0f203ecbcf805e2b"
+      },
+      {
+        "name": "debian-archive-keyring",
+        "version": "2025.1",
+        "ref": "pkg:deb/debian/debian-archive-keyring@2025.1?arch=all&distro=debian-13.7&package-id=7991e18ee6aee390"
+      },
+      {
+        "name": "debianutils",
+        "version": "5.23.2",
+        "ref": "pkg:deb/debian/debianutils@5.23.2?arch=amd64&distro=debian-13.7&package-id=1a372c2eb99c9c63"
+      },
+      {
+        "name": "diffutils",
+        "version": "1:3.10-4",
+        "ref": "pkg:deb/debian/diffutils@1%3A3.10-4?arch=amd64&distro=debian-13.7&package-id=928a2837cd45ff34"
+      },
+      {
+        "name": "dpkg",
+        "version": "1.22.22",
+        "ref": "pkg:deb/debian/dpkg@1.22.22?arch=amd64&distro=debian-13.7&package-id=3fcb1891109bbf9a"
+      },
+      {
+        "name": "fastapi",
+        "version": "0.115.6",
+        "ref": "pkg:pypi/fastapi@0.115.6?package-id=e15de2fc3e3fdd7b"
+      },
+      {
+        "name": "findutils",
+        "version": "4.10.0-3",
+        "ref": "pkg:deb/debian/findutils@4.10.0-3?arch=amd64&distro=debian-13.7&package-id=d26956c159c0ed3a"
+      },
+      {
+        "name": "gcc-14-base",
+        "version": "14.2.0-19",
+        "ref": "pkg:deb/debian/gcc-14-base@14.2.0-19?arch=amd64&distro=debian-13.7&package-id=8a928cc6733b8d4c&upstream=gcc-14"
+      },
+      {
+        "name": "grep",
+        "version": "3.11-4",
+        "ref": "pkg:deb/debian/grep@3.11-4?arch=amd64&distro=debian-13.7&package-id=a92d218620498fb7"
+      },
+      {
+        "name": "gzip",
+        "version": "1.13-1+deb13u1",
+        "ref": "pkg:deb/debian/gzip@1.13-1%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=f18fb39e19d3dae2"
+      },
+      {
+        "name": "h11",
+        "version": "0.16.0",
+        "ref": "pkg:pypi/h11@0.16.0?package-id=a9397326941089e3"
+      },
+      {
+        "name": "hostname",
+        "version": "3.25",
+        "ref": "pkg:deb/debian/hostname@3.25?arch=amd64&distro=debian-13.7&package-id=99de93ca9ff6e65f"
+      },
+      {
+        "name": "httpcore",
+        "version": "1.0.9",
+        "ref": "pkg:pypi/httpcore@1.0.9?package-id=0af98d99b70ec268"
+      },
+      {
+        "name": "httpx",
+        "version": "0.28.1",
+        "ref": "pkg:pypi/httpx@0.28.1?package-id=9e83bb94709370c2"
+      },
+      {
+        "name": "idna",
+        "version": "3.20",
+        "ref": "pkg:pypi/idna@3.20?package-id=2577b1ba80672762"
+      },
+      {
+        "name": "iniconfig",
+        "version": "2.3.1",
+        "ref": "pkg:pypi/iniconfig@2.3.1?package-id=c46cad8aa5c2a688"
+      },
+      {
+        "name": "init-system-helpers",
+        "version": "1.69~deb13u1",
+        "ref": "pkg:deb/debian/init-system-helpers@1.69~deb13u1?arch=all&distro=debian-13.7&package-id=40e23b20a464282c"
+      },
+      {
+        "name": "libacl1",
+        "version": "2.3.2-2+b1",
+        "ref": "pkg:deb/debian/libacl1@2.3.2-2%2Bb1?arch=amd64&distro=debian-13.7&package-id=0af6f2d3417a318d&upstream=acl%402.3.2-2"
+      },
+      {
+        "name": "libapt-pkg7.0",
+        "version": "3.0.3",
+        "ref": "pkg:deb/debian/libapt-pkg7.0@3.0.3?arch=amd64&distro=debian-13.7&package-id=25f4161ec6258e4d&upstream=apt"
+      },
+      {
+        "name": "libattr1",
+        "version": "1:2.5.2-3",
+        "ref": "pkg:deb/debian/libattr1@1%3A2.5.2-3?arch=amd64&distro=debian-13.7&package-id=6f2066ac1c2128fd&upstream=attr"
+      },
+      {
+        "name": "libaudit-common",
+        "version": "1:4.0.2-2+deb13u1",
+        "ref": "pkg:deb/debian/libaudit-common@1%3A4.0.2-2%2Bdeb13u1?arch=all&distro=debian-13.7&package-id=aa068f3c5068edb0&upstream=audit"
+      },
+      {
+        "name": "libaudit1",
+        "version": "1:4.0.2-2+deb13u1",
+        "ref": "pkg:deb/debian/libaudit1@1%3A4.0.2-2%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=a7a836685570653d&upstream=audit"
+      },
+      {
+        "name": "libblkid1",
+        "version": "2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/libblkid1@2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=5c8cb5d5c2e5df78&upstream=util-linux"
+      },
+      {
+        "name": "libbsd0",
+        "version": "0.12.2-2",
+        "ref": "pkg:deb/debian/libbsd0@0.12.2-2?arch=amd64&distro=debian-13.7&package-id=5421a64a3af7445b&upstream=libbsd"
+      },
+      {
+        "name": "libbz2-1.0",
+        "version": "1.0.8-6",
+        "ref": "pkg:deb/debian/libbz2-1.0@1.0.8-6?arch=amd64&distro=debian-13.7&package-id=6004b03bf692a003&upstream=bzip2"
+      },
+      {
+        "name": "libc-bin",
+        "version": "2.41-12+deb13u4",
+        "ref": "pkg:deb/debian/libc-bin@2.41-12%2Bdeb13u4?arch=amd64&distro=debian-13.7&package-id=86ca7491bc4976c9&upstream=glibc"
+      },
+      {
+        "name": "libc6",
+        "version": "2.41-12+deb13u4",
+        "ref": "pkg:deb/debian/libc6@2.41-12%2Bdeb13u4?arch=amd64&distro=debian-13.7&package-id=2dc9b457970cbedd&upstream=glibc"
+      },
+      {
+        "name": "libcap-ng0",
+        "version": "0.8.5-4+b1",
+        "ref": "pkg:deb/debian/libcap-ng0@0.8.5-4%2Bb1?arch=amd64&distro=debian-13.7&package-id=b41a5e7ee674f97b&upstream=libcap-ng%400.8.5-4"
+      },
+      {
+        "name": "libcap2",
+        "version": "1:2.75-10+deb13u1+b3",
+        "ref": "pkg:deb/debian/libcap2@1%3A2.75-10%2Bdeb13u1%2Bb3?arch=amd64&distro=debian-13.7&package-id=08a0ca3e69a0afe7&upstream=libcap2%401%3A2.75-10%2Bdeb13u1"
+      },
+      {
+        "name": "libcrypt1",
+        "version": "1:4.4.38-1",
+        "ref": "pkg:deb/debian/libcrypt1@1%3A4.4.38-1?arch=amd64&distro=debian-13.7&package-id=757587ed7bd452da&upstream=libxcrypt"
+      },
+      {
+        "name": "libdb5.3t64",
+        "version": "5.3.28+dfsg2-9",
+        "ref": "pkg:deb/debian/libdb5.3t64@5.3.28%2Bdfsg2-9?arch=amd64&distro=debian-13.7&package-id=691cff16cd9ac9e6&upstream=db5.3"
+      },
+      {
+        "name": "libdebconfclient0",
+        "version": "0.280",
+        "ref": "pkg:deb/debian/libdebconfclient0@0.280?arch=amd64&distro=debian-13.7&package-id=58dd2cc5f3eff2c7&upstream=cdebconf"
+      },
+      {
+        "name": "libffi8",
+        "version": "3.4.8-2",
+        "ref": "pkg:deb/debian/libffi8@3.4.8-2?arch=amd64&distro=debian-13.7&package-id=f169b5e0007ecadc&upstream=libffi"
+      },
+      {
+        "name": "libgcc-s1",
+        "version": "14.2.0-19",
+        "ref": "pkg:deb/debian/libgcc-s1@14.2.0-19?arch=amd64&distro=debian-13.7&package-id=2338ed612a82adf3&upstream=gcc-14"
+      },
+      {
+        "name": "libgdbm6t64",
+        "version": "1.24-2",
+        "ref": "pkg:deb/debian/libgdbm6t64@1.24-2?arch=amd64&distro=debian-13.7&package-id=057243fa006ab11e&upstream=gdbm"
+      },
+      {
+        "name": "libgmp10",
+        "version": "2:6.3.0+dfsg-3",
+        "ref": "pkg:deb/debian/libgmp10@2%3A6.3.0%2Bdfsg-3?arch=amd64&distro=debian-13.7&package-id=1c7a811a4bd26f31&upstream=gmp"
+      },
+      {
+        "name": "libhogweed6t64",
+        "version": "3.10.1-1",
+        "ref": "pkg:deb/debian/libhogweed6t64@3.10.1-1?arch=amd64&distro=debian-13.7&package-id=149dfd0fe1a0f504&upstream=nettle"
+      },
+      {
+        "name": "liblastlog2-2",
+        "version": "2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/liblastlog2-2@2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=bd4b70ba8c48d583&upstream=util-linux"
+      },
+      {
+        "name": "liblz4-1",
+        "version": "1.10.0-4",
+        "ref": "pkg:deb/debian/liblz4-1@1.10.0-4?arch=amd64&distro=debian-13.7&package-id=4027ba8f2aab9b06&upstream=lz4"
+      },
+      {
+        "name": "liblzma5",
+        "version": "5.8.1-1+deb13u2",
+        "ref": "pkg:deb/debian/liblzma5@5.8.1-1%2Bdeb13u2?arch=amd64&distro=debian-13.7&package-id=e9f1cb9905037b05&upstream=xz-utils"
+      },
+      {
+        "name": "libmd0",
+        "version": "1.1.0-2+b1",
+        "ref": "pkg:deb/debian/libmd0@1.1.0-2%2Bb1?arch=amd64&distro=debian-13.7&package-id=ffd304ab77f359f2&upstream=libmd%401.1.0-2"
+      },
+      {
+        "name": "libmount1",
+        "version": "2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/libmount1@2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=cfe9c78846143096&upstream=util-linux"
+      },
+      {
+        "name": "libncursesw6",
+        "version": "6.5+20250216-2",
+        "ref": "pkg:deb/debian/libncursesw6@6.5%2B20250216-2?arch=amd64&distro=debian-13.7&package-id=212a71fa16031fdf&upstream=ncurses"
+      },
+      {
+        "name": "libnettle8t64",
+        "version": "3.10.1-1",
+        "ref": "pkg:deb/debian/libnettle8t64@3.10.1-1?arch=amd64&distro=debian-13.7&package-id=830df7dec0785e1a&upstream=nettle"
+      },
+      {
+        "name": "libpam-modules",
+        "version": "1.7.0-5",
+        "ref": "pkg:deb/debian/libpam-modules@1.7.0-5?arch=amd64&distro=debian-13.7&package-id=1f32975dfd37be95&upstream=pam"
+      },
+      {
+        "name": "libpam-modules-bin",
+        "version": "1.7.0-5",
+        "ref": "pkg:deb/debian/libpam-modules-bin@1.7.0-5?arch=amd64&distro=debian-13.7&package-id=cb7fdbb7b6a04bdc&upstream=pam"
+      },
+      {
+        "name": "libpam-runtime",
+        "version": "1.7.0-5",
+        "ref": "pkg:deb/debian/libpam-runtime@1.7.0-5?arch=all&distro=debian-13.7&package-id=eb5873c5c35e21b8&upstream=pam"
+      },
+      {
+        "name": "libpam0g",
+        "version": "1.7.0-5",
+        "ref": "pkg:deb/debian/libpam0g@1.7.0-5?arch=amd64&distro=debian-13.7&package-id=1c6c7728b37b94de&upstream=pam"
+      },
+      {
+        "name": "libpcre2-8-0",
+        "version": "10.46-1~deb13u3",
+        "ref": "pkg:deb/debian/libpcre2-8-0@10.46-1~deb13u3?arch=amd64&distro=debian-13.7&package-id=64a80a2e1e2b644e&upstream=pcre2"
+      },
+      {
+        "name": "libreadline8t64",
+        "version": "8.2-6",
+        "ref": "pkg:deb/debian/libreadline8t64@8.2-6?arch=amd64&distro=debian-13.7&package-id=851027559f660f3d&upstream=readline"
+      },
+      {
+        "name": "libseccomp2",
+        "version": "2.6.0-2",
+        "ref": "pkg:deb/debian/libseccomp2@2.6.0-2?arch=amd64&distro=debian-13.7&package-id=484580cc24603555&upstream=libseccomp"
+      },
+      {
+        "name": "libselinux1",
+        "version": "3.8.1-1",
+        "ref": "pkg:deb/debian/libselinux1@3.8.1-1?arch=amd64&distro=debian-13.7&package-id=519cd66aedc85adf&upstream=libselinux"
+      },
+      {
+        "name": "libsemanage-common",
+        "version": "3.8.1-1",
+        "ref": "pkg:deb/debian/libsemanage-common@3.8.1-1?arch=all&distro=debian-13.7&package-id=c638ea9ec05d410a&upstream=libsemanage"
+      },
+      {
+        "name": "libsemanage2",
+        "version": "3.8.1-1",
+        "ref": "pkg:deb/debian/libsemanage2@3.8.1-1?arch=amd64&distro=debian-13.7&package-id=48d5af32889b375b&upstream=libsemanage"
+      },
+      {
+        "name": "libsepol2",
+        "version": "3.8.1-1",
+        "ref": "pkg:deb/debian/libsepol2@3.8.1-1?arch=amd64&distro=debian-13.7&package-id=3392d9f030dfa725&upstream=libsepol"
+      },
+      {
+        "name": "libsmartcols1",
+        "version": "2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/libsmartcols1@2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=a6e51e84db754048&upstream=util-linux"
+      },
+      {
+        "name": "libsqlite3-0",
+        "version": "3.46.1-7+deb13u2",
+        "ref": "pkg:deb/debian/libsqlite3-0@3.46.1-7%2Bdeb13u2?arch=amd64&distro=debian-13.7&package-id=4bf5c63b07c21ab3&upstream=sqlite3"
+      },
+      {
+        "name": "libssl3t64",
+        "version": "3.5.7-1~deb13u3",
+        "ref": "pkg:deb/debian/libssl3t64@3.5.7-1~deb13u3?arch=amd64&distro=debian-13.7&package-id=baa2cbd683b12b8d&upstream=openssl"
+      },
+      {
+        "name": "libstdc++6",
+        "version": "14.2.0-19",
+        "ref": "pkg:deb/debian/libstdc%2B%2B6@14.2.0-19?arch=amd64&distro=debian-13.7&package-id=7dc961cf921ecd08&upstream=gcc-14"
+      },
+      {
+        "name": "libsystemd0",
+        "version": "257.13-1~deb13u1",
+        "ref": "pkg:deb/debian/libsystemd0@257.13-1~deb13u1?arch=amd64&distro=debian-13.7&package-id=8bfae933fd40ea5d&upstream=systemd"
+      },
+      {
+        "name": "libtinfo6",
+        "version": "6.5+20250216-2",
+        "ref": "pkg:deb/debian/libtinfo6@6.5%2B20250216-2?arch=amd64&distro=debian-13.7&package-id=7402a3d31bb024db&upstream=ncurses"
+      },
+      {
+        "name": "libudev1",
+        "version": "257.13-1~deb13u1",
+        "ref": "pkg:deb/debian/libudev1@257.13-1~deb13u1?arch=amd64&distro=debian-13.7&package-id=4468281f476fc994&upstream=systemd"
+      },
+      {
+        "name": "libuuid1",
+        "version": "2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/libuuid1@2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=faedc3139e685610&upstream=util-linux"
+      },
+      {
+        "name": "libxxhash0",
+        "version": "0.8.3-2",
+        "ref": "pkg:deb/debian/libxxhash0@0.8.3-2?arch=amd64&distro=debian-13.7&package-id=8047a2247d2d0e45&upstream=xxhash"
+      },
+      {
+        "name": "libzstd1",
+        "version": "1.5.7+dfsg-1",
+        "ref": "pkg:deb/debian/libzstd1@1.5.7%2Bdfsg-1?arch=amd64&distro=debian-13.7&package-id=a054cdb90cdf7119&upstream=libzstd"
+      },
+      {
+        "name": "login",
+        "version": "1:4.16.0-2+really2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/login@1%3A4.16.0-2%2Breally2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=9db9d188fa9e89fc&upstream=util-linux%402.41.5-0%2Bdeb13u1"
+      },
+      {
+        "name": "login.defs",
+        "version": "1:4.17.4-2",
+        "ref": "pkg:deb/debian/login.defs@1%3A4.17.4-2?arch=all&distro=debian-13.7&package-id=893ab677af71bedc&upstream=shadow"
+      },
+      {
+        "name": "mawk",
+        "version": "1.3.4.20250131-1",
+        "ref": "pkg:deb/debian/mawk@1.3.4.20250131-1?arch=amd64&distro=debian-13.7&package-id=d66f7150f339b011"
+      },
+      {
+        "name": "mount",
+        "version": "2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/mount@2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=bd55752b0f187487&upstream=util-linux"
+      },
+      {
+        "name": "ncurses-base",
+        "version": "6.5+20250216-2",
+        "ref": "pkg:deb/debian/ncurses-base@6.5%2B20250216-2?arch=all&distro=debian-13.7&package-id=3f9378db54aaac9e&upstream=ncurses"
+      },
+      {
+        "name": "ncurses-bin",
+        "version": "6.5+20250216-2",
+        "ref": "pkg:deb/debian/ncurses-bin@6.5%2B20250216-2?arch=amd64&distro=debian-13.7&package-id=e96cb50e09a471e0&upstream=ncurses"
+      },
+      {
+        "name": "netbase",
+        "version": "6.5",
+        "ref": "pkg:deb/debian/netbase@6.5?arch=all&distro=debian-13.7&package-id=2059dae617a0ca9a"
+      },
+      {
+        "name": "openssl",
+        "version": "3.5.7-1~deb13u3",
+        "ref": "pkg:deb/debian/openssl@3.5.7-1~deb13u3?arch=amd64&distro=debian-13.7&package-id=26fb7249b31dd31b"
+      },
+      {
+        "name": "openssl-provider-legacy",
+        "version": "3.5.7-1~deb13u3",
+        "ref": "pkg:deb/debian/openssl-provider-legacy@3.5.7-1~deb13u3?arch=amd64&distro=debian-13.7&package-id=cc488fb0a29f8a98&upstream=openssl"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3",
+        "ref": "pkg:pypi/packaging@26.3?package-id=2cb9becf765a0ee1"
+      },
+      {
+        "name": "passwd",
+        "version": "1:4.17.4-2",
+        "ref": "pkg:deb/debian/passwd@1%3A4.17.4-2?arch=amd64&distro=debian-13.7&package-id=a0c2eaa9ca5431ff&upstream=shadow"
+      },
+      {
+        "name": "perl-base",
+        "version": "5.40.1-6+deb13u1",
+        "ref": "pkg:deb/debian/perl-base@5.40.1-6%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=1ed310f43f3fc66d&upstream=perl"
+      },
+      {
+        "name": "pip",
+        "version": "25.0.1",
+        "ref": "pkg:pypi/pip@25.0.1?package-id=b07d834d26c4749b"
+      },
+      {
+        "name": "pluggy",
+        "version": "1.7.0",
+        "ref": "pkg:pypi/pluggy@1.7.0?package-id=1518b36ec4369f04"
+      },
+      {
+        "name": "pydantic",
+        "version": "2.14.1",
+        "ref": "pkg:pypi/pydantic@2.14.1?package-id=556498f265b96c17"
+      },
+      {
+        "name": "pydantic-core",
+        "version": "2.50.1",
+        "ref": "pkg:pypi/pydantic-core@2.50.1?package-id=a2844c55dbc66dfe"
+      },
+      {
+        "name": "pytest",
+        "version": "8.3.4",
+        "ref": "pkg:pypi/pytest@8.3.4?package-id=b6c31b35792d64d7"
+      },
+      {
+        "name": "python",
+        "version": "3.12.16",
+        "ref": "pkg:generic/python@3.12.16?package-id=11b3ed9395df77d2"
+      },
+      {
+        "name": "readline-common",
+        "version": "8.2-6",
+        "ref": "pkg:deb/debian/readline-common@8.2-6?arch=all&distro=debian-13.7&package-id=6e61c8bb5094dfc3&upstream=readline"
+      },
+      {
+        "name": "sed",
+        "version": "4.9-2+deb13u1",
+        "ref": "pkg:deb/debian/sed@4.9-2%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=095aaa03979d18fd"
+      },
+      {
+        "name": "sqv",
+        "version": "1.3.0-3+b2",
+        "ref": "pkg:deb/debian/sqv@1.3.0-3%2Bb2?arch=amd64&distro=debian-13.7&package-id=2c6d91dc7bbd50cb&upstream=rust-sequoia-sqv%401.3.0-3"
+      },
+      {
+        "name": "starlette",
+        "version": "0.41.3",
+        "ref": "pkg:pypi/starlette@0.41.3?package-id=e44dfe4b14f12fa5"
+      },
+      {
+        "name": "sysvinit-utils",
+        "version": "3.14-4",
+        "ref": "pkg:deb/debian/sysvinit-utils@3.14-4?arch=amd64&distro=debian-13.7&package-id=199f374ab128923e&upstream=sysvinit"
+      },
+      {
+        "name": "tar",
+        "version": "1.35+dfsg-3.1",
+        "ref": "pkg:deb/debian/tar@1.35%2Bdfsg-3.1?arch=amd64&distro=debian-13.7&package-id=213d133cc46bf69b"
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.16.0",
+        "ref": "pkg:pypi/typing-extensions@4.16.0?package-id=65d9590cf15d34e7"
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.4",
+        "ref": "pkg:pypi/typing-inspection@0.4.4?package-id=a353205f688d5a43"
+      },
+      {
+        "name": "tzdata",
+        "version": "2026e-0+deb13u1",
+        "ref": "pkg:deb/debian/tzdata@2026e-0%2Bdeb13u1?arch=all&distro=debian-13.7&package-id=2cb8ef8acacd834c"
+      },
+      {
+        "name": "util-linux",
+        "version": "2.41.5-0+deb13u1",
+        "ref": "pkg:deb/debian/util-linux@2.41.5-0%2Bdeb13u1?arch=amd64&distro=debian-13.7&package-id=166978fa81223e72"
+      },
+      {
+        "name": "uvicorn",
+        "version": "0.32.1",
+        "ref": "pkg:pypi/uvicorn@0.32.1?package-id=d72282dfc2b979e3"
+      },
+      {
+        "name": "zlib1g",
+        "version": "1:1.3.dfsg+really1.3.1-1+b1",
+        "ref": "pkg:deb/debian/zlib1g@1%3A1.3.dfsg%2Breally1.3.1-1%2Bb1?arch=amd64&distro=debian-13.7&package-id=8a1ec6d9372df578&upstream=zlib%401%3A1.3.dfsg%2Breally1.3.1-1"
+      },
+      {
+        "name": "debian",
+        "version": "13.7",
+        "ref": "os:debian@13.7"
+      }
+    ]
+  }
+}

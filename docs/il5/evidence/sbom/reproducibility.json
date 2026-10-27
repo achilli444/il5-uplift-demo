@@ -1,0 +1,13 @@
+{
+  "component_set_identical": true,
+  "compared_fields": [
+    "type",
+    "name",
+    "version",
+    "purl"
+  ],
+  "multiplicity_checked": true,
+  "entries": 25,
+  "first_component_set_sha256": "06a183cef91218c3f446d39c774b663d988995b1072d4f2832a08fa1a76cbc35",
+  "second_component_set_sha256": "06a183cef91218c3f446d39c774b663d988995b1072d4f2832a08fa1a76cbc35"
+}

@@ -1,0 +1,29 @@
+{
+  "repository": "https://github.com/achilli444/il5-uplift-demo",
+  "baseline_main_sha": "977214f9e95defb7075b11c74a610373711d4179",
+  "scanned_branch": "il5/main",
+  "scanned_head_sha": "68ad3103501d8445ef7e0deb03a6cdc8d4daa54d",
+  "application_diff_from_baseline": "git diff 977214f HEAD --stat -- . :!docs produced no output",
+  "filename_sha7": "977214f",
+  "timestamp_utc": "2026-10-27T08:53:11.558475+00:00",
+  "operator": "https://devin-gtm.devinenterprise.com/sessions/92802104a79942b2ba71f310cdfa439c",
+  "tool_versions": {
+    "syft": "Application:   syft\nVersion:       1.54.1\nBuildDate:     2026-10-06T15:32:19Z\nGitCommit:     b254e6d92f28c3868a755f62fb3ca8f26e9fee76\nGitDescription: v1.54.1\nPlatform:      linux/amd64\nGoVersion:     go1.26.8\nCompiler:      gc\nSchemaVersion: 16.1.11\n",
+    "grype": "Application:         grype\nVersion:             0.120.1\nBuildDate:           2026-10-06T20:41:29Z\nGitCommit:           6f8d854af29d3a3086b11a84afa51554a2a245fe\nGitDescription:      v0.120.1\nPlatform:            linux/amd64\nGoVersion:           go1.26.8\nCompiler:            gc\nSyft Version:        v1.54.1\nSupported DB Schema: 6\n",
+    "trivy": "Version: 0.69.3\nVulnerability DB:\n  Version: 2\n  UpdatedAt: 2026-10-27 07:13:33.504287223 +0000 UTC\n  NextUpdate: 2026-10-28 07:13:33.504286922 +0000 UTC\n  DownloadedAt: 2026-10-27 08:50:34.871631548 +0000 UTC\n",
+    "pip-tools": "pip-compile, version 7.6.2\n"
+  },
+  "generator": "Syft; CycloneDX 1.6 and SPDX 2.3",
+  "runtime": "Python 3.12 / FastAPI",
+  "mode": "baseline, not post-remediation",
+  "deployable": "il5-uplift-demo-source",
+  "sbom_command": "syft dir:/home/ubuntu/sbom-work/source --source-name il5-uplift-demo-source --source-version 977214f -o cyclonedx-json@1.6=il5-uplift-demo_source_sbom_20261027_977214f.cdx.json -o spdx-json@2.3=il5-uplift-demo_source_sbom_20261027_977214f.spdx.json",
+  "scan_commands": [
+    "grype sbom:il5-uplift-demo_source_sbom_20261027_977214f.cdx.json -o json > il5-uplift-demo_source_sbom_20261027_977214f.grype.json",
+    "trivy sbom il5-uplift-demo_source_sbom_20261027_977214f.cdx.json --format json --output il5-uplift-demo_source_sbom_20261027_977214f.trivy.json"
+  ],
+  "built_here": false,
+  "source_preparation": "git archive HEAD extracted into scratch tree; pip-compile --generate-hashes creates requirements.lock; copied to requirements-resolved.txt for Syft recognition alongside original requirements.txt. Scratch lock included in package; not an application lockfile.",
+  "lock_command": "/home/ubuntu/sbom-work/venv/bin/pip-compile --generate-hashes --output-file=/home/ubuntu/sbom-work/source/requirements.lock /home/ubuntu/sbom-work/source/requirements.txt",
+  "reproducibility": "Second Syft run on same scratch source: identical sorted (type,name,version,purl) component entries, including multiplicity; timestamps/UUID excluded"
+}

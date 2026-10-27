@@ -1,0 +1,45 @@
+{
+  "repository": "https://github.com/achilli444/il5-uplift-demo",
+  "baseline_main_sha": "977214f9e95defb7075b11c74a610373711d4179",
+  "scanned_branch": "il5/main",
+  "scanned_head_sha": "68ad3103501d8445ef7e0deb03a6cdc8d4daa54d",
+  "application_diff_from_baseline": "git diff 977214f HEAD --stat -- . :!docs produced no output",
+  "filename_sha7": "977214f",
+  "timestamp_utc": "2026-10-27T08:53:11.558475+00:00",
+  "operator": "https://devin-gtm.devinenterprise.com/sessions/92802104a79942b2ba71f310cdfa439c",
+  "tool_versions": {
+    "syft": "Application:   syft\nVersion:       1.54.1\nBuildDate:     2026-10-06T15:32:19Z\nGitCommit:     b254e6d92f28c3868a755f62fb3ca8f26e9fee76\nGitDescription: v1.54.1\nPlatform:      linux/amd64\nGoVersion:     go1.26.8\nCompiler:      gc\nSchemaVersion: 16.1.11\n",
+    "grype": "Application:         grype\nVersion:             0.120.1\nBuildDate:           2026-10-06T20:41:29Z\nGitCommit:           6f8d854af29d3a3086b11a84afa51554a2a245fe\nGitDescription:      v0.120.1\nPlatform:            linux/amd64\nGoVersion:           go1.26.8\nCompiler:            gc\nSyft Version:        v1.54.1\nSupported DB Schema: 6\n",
+    "trivy": "Version: 0.69.3\nVulnerability DB:\n  Version: 2\n  UpdatedAt: 2026-10-27 07:13:33.504287223 +0000 UTC\n  NextUpdate: 2026-10-28 07:13:33.504286922 +0000 UTC\n  DownloadedAt: 2026-10-27 08:50:34.871631548 +0000 UTC\n",
+    "pip-tools": "pip-compile, version 7.6.2\n"
+  },
+  "generator": "Syft; CycloneDX 1.6 and SPDX 2.3",
+  "runtime": "Python 3.12 / FastAPI",
+  "mode": "baseline, not post-remediation",
+  "deployable": "il5-uplift-demo-image",
+  "sbom_command": "syft docker:mrt:baseline --source-name il5-uplift-demo-image --source-version 977214f -o cyclonedx-json@1.6=il5-uplift-demo_image_sbom_20261027_977214f.cdx.json -o spdx-json@2.3=il5-uplift-demo_image_sbom_20261027_977214f.spdx.json",
+  "scan_commands": [
+    "grype sbom:il5-uplift-demo_image_sbom_20261027_977214f.cdx.json -o json > il5-uplift-demo_image_sbom_20261027_977214f.grype.json",
+    "trivy sbom il5-uplift-demo_image_sbom_20261027_977214f.cdx.json --format json --output il5-uplift-demo_image_sbom_20261027_977214f.trivy.json"
+  ],
+  "built_here": true,
+  "pulled_final_artifact": false,
+  "build_command": "docker build --pull=false -t mrt:baseline .",
+  "original_build_attempt": "docker build -t mrt:baseline . failed twice with Docker Hub HTTP 429 Too Many Requests",
+  "image_id": "sha256:76a4c64477bbf32b6800f5252eaed64927e22eac83e226c6f1574f39915b8670",
+  "image_repo_digests": [
+    "mrt@sha256:76a4c64477bbf32b6800f5252eaed64927e22eac83e226c6f1574f39915b8670"
+  ],
+  "image_config_digest": "sha256:3c567f7ee7e1837303900ac53b6d05695e7faf83d2fecf3f58bd9d694fe5a385",
+  "final_stage_manifest_digest": "sha256:8c425397c1eed6dc3ecb713d685024202760306448aa7d2376bc49fcbbea29ca",
+  "base_tag": "python:3.12-slim",
+  "base_tag_floating": true,
+  "base_mirror": "mirror.gcr.io/library/python:3.12-slim",
+  "base_resolved_manifest_digest": "sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f",
+  "base_repo_digests": [
+    "python@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f",
+    "mirror.gcr.io/library/python@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f"
+  ],
+  "mirror_note": "Google mirror.gcr.io serves Docker Hub library content. Pulled mirror image and tagged locally as python:3.12-slim; Dockerfile unchanged. Digest not independently compared with Docker Hub because it was rate-limited.",
+  "scope": "Final stage, squashed filesystem; no filtering of development packages or cataloged files"
+}
