@@ -5,9 +5,9 @@
 | 1 Init + boundary | done | 00-boundary.md on il5/main; baseline main @ 977214f | 2026-10-27 |
 | 2 Child: SBOM | done | https://devin-gtm.devinenterprise.com/sessions/92802104a79942b2ba71f310cdfa439c -> docs/il5/evidence/sbom/ @ 9aa43ae (source 19 / image 108 purls; grype image 0C/58H) | 2026-10-27 |
 | Gate 1 ISSO SBOM accepted | done | Achal Amin (ISSO), in parent session chat: "ISSO accepts the SBOM as baseline" | 2026-10-27 |
-| 3a Child: Security scan | running | https://devin-gtm.devinenterprise.com/sessions/5b840eca3ca046dda2fd3ebc28f901f4 (Security 2.0 Normal effort, user-selected on form: https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f; SonarQube not available - MCP token not authorized, no project) | 2026-10-27 |
-| 3b Child: Compliance scans | running | https://devin-gtm.devinenterprise.com/sessions/ef48afef75b74f0f8a53366bb4fc19a3 | 2026-10-27 |
-| 4 Child: De-conflict + user selection | | 10-remediation-register.md, 12-remediation-scope.csv | |
+| 3a Child: Security scan | done | https://devin-gtm.devinenterprise.com/sessions/5b840eca3ca046dda2fd3ebc28f901f4 (Security 2.0 Normal effort, user-selected on form: https://devin-gtm.devinenterprise.com/code-scan/87996f1a24b348bfa10fbfa16f74bb7f; SonarQube not available - MCP token not authorized, no project); 8 findings (0C/3H/1M/4L) @ 50308ef, 02-security-summary.md | 2026-10-27 |
+| 3b Child: Compliance scans | done (partial - NIST/SRG/ASD cancelled by ISSO 09:02Z; K8s complete) | https://devin-gtm.devinenterprise.com/sessions/ef48afef75b74f0f8a53366bb4fc19a3; scans b0d4def0 (NIST 17), c3960b3b (SRG 53), c8e52e9e (ASD 0 - not assessed), 63e0dadf (K8s 2) @ 8a8ba63, 03-compliance-summary.md | 2026-10-27 |
+| 4 Child: De-conflict + user selection | running | 10-remediation-register.md, 12-remediation-scope.csv | |
 | Gate 2 user selected units (who/how many) | | | |
 | 5 Dispositions applied | | Findings export path | |
 | 6 Wave 1 children | | unit -> child URL -> PR | |
@@ -25,3 +25,4 @@ ISSM parameter values: see 00-boundary.md
 
 Parent session: https://devin-gtm.devinenterprise.com/sessions/d21b4bd30b9842b68f8283df20b9a52e
 Existing scanners (ISSO answer 2026-10-27): Devin Security 2.0 + SonarQube ingest. Scans started in parallel with SBOM before Gate 1, per ISSO choice "Start scans now".
+ISSO instruction 2026-10-27 09:01Z: "pause the scans wherever they are and go to the next step" - de-conflict runs on partial Compliance results; ASD STIG re-scan is a follow-up.
