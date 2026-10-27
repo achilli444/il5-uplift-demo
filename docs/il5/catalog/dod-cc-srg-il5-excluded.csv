@@ -1,0 +1,7 @@
+requirement,out_of_scope,reason
+Tenant/mission-owner separation (IL5 dedicated infrastructure),out-of-scope: platform,AWS GovCloud / EKS inherited
+Physical facility and personnel security of CSP,out-of-scope: platform,CSP inherited
+Boundary CAP/BCAP connection and DISA connection approval,out-of-scope: platform,"platform/CAP inherited (SC-7, AC-17)"
+Data at rest encryption (KMS),out-of-scope: platform,SC-28 inherited
+Cloud incident reporting to DoD (CSSP),out-of-scope: process,organizational
+Personnel screening of privileged users (US persons),out-of-scope: process,organizational; app-side role gating covered by SRG-IL5-PRIV-ACCESS

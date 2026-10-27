@@ -1,0 +1,1237 @@
+{
+ "cui": "CUI // treat as CUI unless the ISSM says otherwise",
+ "system": "il5-uplift-demo",
+ "repo": "achilli444/il5-uplift-demo",
+ "branch": "il5/main",
+ "scanned_commit": "45da2de62033cd4ee260a7650259213a570d7e88",
+ "exported_utc": "2026-10-27T09:02:06Z",
+ "scans": {
+  "nist-800-53-rev5-high": {
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "profile_id": "csprof-569ee8cc2b86400cb32b5ff5d9613d8e",
+   "status": "partial - paused by ISSO at 2026-10-27T09:02:06Z",
+   "criteria_total": 33,
+   "criteria_excluded": 5,
+   "criteria_with_findings": 22,
+   "findings": 17,
+   "by_sev": {
+    "high": 12,
+    "low": 2,
+    "medium": 3
+   },
+   "url": "https://devin-gtm.devinenterprise.com/code-scan/b0d4def03df74cab9c8f66fb8b7316f9/summary"
+  },
+  "dod-cc-srg-il5": {
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "profile_id": "csprof-96249806f4254aceaa69311cce6bd5ae",
+   "status": "partial - paused by ISSO at 2026-10-27T09:02:06Z",
+   "criteria_total": 12,
+   "criteria_excluded": 6,
+   "criteria_with_findings": 12,
+   "findings": 53,
+   "by_sev": {
+    "medium": 9,
+    "high": 34,
+    "low": 10
+   },
+   "url": "https://devin-gtm.devinenterprise.com/code-scan/c3960b3b4c884acf90dcf6931f910461/summary"
+  },
+  "asd-stig-v6r5": {
+   "scan_id": "scan-c8e52e9e2081421ea05148d95868147e",
+   "profile_id": "csprof-1136820cd35447b4aaae051feac112bd",
+   "status": "partial - paused by ISSO at 2026-10-27T09:02:06Z",
+   "criteria_total": 161,
+   "criteria_excluded": 125,
+   "criteria_with_findings": 0,
+   "findings": 0,
+   "by_sev": {},
+   "url": "https://devin-gtm.devinenterprise.com/code-scan/c8e52e9e2081421ea05148d95868147e/summary"
+  },
+  "kubernetes-stig-v2r6": {
+   "scan_id": "scan-63e0dadf072843d78ef6f9b5515c55f8",
+   "profile_id": "csprof-ee435f079d5848328f0141f32e1704cb",
+   "status": "completed (before ISSO pause)",
+   "criteria_total": 8,
+   "criteria_excluded": 84,
+   "criteria_with_findings": 5,
+   "findings": 2,
+   "by_sev": {
+    "high": 1,
+    "low": 1
+   },
+   "url": "https://devin-gtm.devinenterprise.com/code-scan/63e0dadf072843d78ef6f9b5515c55f8/summary"
+  }
+ },
+ "note": "criteria_evaluated per paused scan is not exposed by the scan API; criteria_with_findings counts distinct catalog criteria cited by findings so far. No findings were assigned, fixed or dismissed.",
+ "findings": [
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-f6b60b7f9fb743328283bef8b5716bfb",
+   "title": "Bulk CUI export, token failures and server errors generate no audit records",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "AU-12",
+    "AU-2",
+    "AU-3"
+   ],
+   "raw": "- sfind-f6b60b7f9fb743328283bef8b5716bfb: Bulk CUI export, token failures and server errors generate no audit records [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    Only login success/failure and single-asset reads are audited; the `/export` bulk data export (success or 403), invalid-token rejections, 404s and unhandled errors produce no audit record.\n    \n    ##### Applicability\n    AU-2 c and AU-12 a/c: the system must generate records for selected event types; data export and authentication/authorization failures are standard selected events for an IL5 CUI system. Boundary doc marks AU-2/AU-12 as code-owned.\n    \n    ##### Evidence\n    Lines 71-75: `export` returns all asset records (CUI) with no `audit()` call on either the success or the 403 path. Lines 55-59: `require_token` raises 401 without auditing. Lines 32-35: exception handler does not log. Lines 65-66: 404 path not audited.\n    \n    ##### Impact\n    - The most sensitive operation (bulk export of all aircraft readiness/location data) leaves no trace.\n    - Brute-force attempts on the export API key or forged tokens are invisible.\n    - Assumes no platform-side request logging is treated as the audit record; uvicorn access logs lack identity.\n  Recommendation: Add audit calls (with full AU-3 fields) for export success and denial, token validation failures, 404 on asset lookup, and unhandled exceptions; consider an audit middleware that records every request outcome so new routes are covered by default.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:71-75\n    Commentary: Bulk export with no audit call on success or denial.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/main.py:55-59\n    Commentary: Token validation failure raises 401 without an audit record.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-ecc89cb0f7504931be4965ba9ac81cb4",
+   "title": "Login endpoint has no unsuccessful-attempt limit or account lockout",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-7"
+   ],
+   "raw": "- sfind-ecc89cb0f7504931be4965ba9ac81cb4: Login endpoint has no unsuccessful-attempt limit or account lockout [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `POST /login` compares credentials and returns 401 on failure without counting attempts, so unlimited password guessing is possible against any account.\n    \n    ##### Applicability\n    AC-7 with the tailored parameter of 3 consecutive invalid attempts in 15 minutes and 15-minute lockout (catalog and `00-boundary.md`). The boundary doc marks AC-7 as code-owned; this app performs its own password authentication rather than delegating to the IdP.\n    \n    ##### Evidence\n    Lines 44-49: on mismatch the handler only audits and raises 401. No counter, lock state or lockout check exists in `main.py` or `db.py` (users table has only username and password_hash).\n    \n    ##### Impact\n    - Online brute force of the seeded `operator` account (weak password, MD5 hash) is unbounded.\n    - Could not verify whether an ingress rate limiter exists; none is defined in `k8s/`.\n  Recommendation: Track consecutive failures per username (and timestamp of first failure); after 3 failures within 15 minutes lock the account for 15 minutes, reject logins while locked (same generic 401), reset on success, and audit lock/unlock events. Add tests for lockout.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:44-52\n    Commentary: Login failure path has no attempt counting or lockout check.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}\n  Snippet: app/db.py:9-9\n    Commentary: Users table has no columns for failed-attempt count or lock expiry.\n    Code:\n          CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT NOT NULL);"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-deb5aa96a0f6457ab882fc366750060a",
+   "title": "Global exception handler returns exception text and full traceback to clients",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "SI-11"
+   ],
+   "raw": "- sfind-deb5aa96a0f6457ab882fc366750060a: Global exception handler returns exception text and full traceback to clients [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    The catch-all FastAPI exception handler returns `str(exc)` and `traceback.format_exc()` in the 500 response body for any unhandled error on any route, including unauthenticated ones.\n    \n    ##### Applicability\n    SI-11 (error messages without revealing exploitable information; detailed errors only to authorized personnel). The handler is registered for `Exception` app-wide, so every endpoint in this service is in scope.\n    \n    ##### Evidence\n    `main.py` lines 32-35 register the handler and serialize the exception message and stack trace into the JSON response. No logging of the error server-side occurs, and no generic message is substituted. Any input that raises (e.g. a malformed SQL fragment in `/assets/{name}` reaching `db.find_asset`) returns file paths, module names, SQL text and line numbers to the caller.\n    \n    ##### Impact\n    - Internal source paths, library versions, SQL statements and CUI-adjacent data in exception messages are disclosed to any client.\n    - Combined with the SQL concatenation in `db.find_asset`, error output aids injection exploitation.\n    - The error is also not written to the audit/log stream, so the event is lost server-side.\n  Recommendation: Return a generic body such as {\"error\": \"internal error\", \"id\": <correlation id>} with status 500, and log the traceback server-side (log.exception) with the correlation id. Add a regression test asserting no 'Traceback' text in 500 responses.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:32-35\n    Commentary: App-wide handler returns exception string and formatted traceback in the HTTP response.\n    Code:\n      @app.exception_handler(Exception)\n      async def debug_exception_handler(request: Request, exc: Exception):\n          # G5: internals leak to the client\n          return JSONResponse(status_code=500, content={\"error\": str(exc), \"trace\": traceback.format_exc()})"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-d61fd21d9b2c4413bf1c124f4fe86ab0",
+   "title": "Token signing secret falls back to a known default value",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "CM-6",
+    "IA-5",
+    "SC-23"
+   ],
+   "raw": "- sfind-d61fd21d9b2c4413bf1c124f4fe86ab0: Token signing secret falls back to a known default value [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `TOKEN_SECRET` is read from the environment but defaults to the literal `change-me` when unset, so a missing env var silently makes every bearer token forgeable.\n    \n    ##### Applicability\n    SC-23 session authenticity, IA-5(1) authenticator protection and CM-6 secure configuration. The HMAC-SHA256 algorithm in `auth.py` is approved; the gap is the key material.\n    \n    ##### Evidence\n    Line 5 supplies the default. `auth.issue_token`/`verify_token` (auth.py 18, 29) sign and verify with it; `main.require_token` trusts the resulting `sub` claim. Anyone knowing the default can mint a token for any username.\n    \n    ##### Impact\n    - Complete authentication bypass for `/assets/*` whenever the variable is not set (e.g. local runs, misconfigured deployments).\n    - Could not verify runtime env; the k8s manifest sets it, but to a plaintext literal (see deployment.yaml finding).\n  Recommendation: Remove the default; require TOKEN_SECRET from a mounted secret, enforce a minimum length (>=32 random bytes), and fail startup if absent or weak.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/settings.py:5-5\n    Commentary: Insecure fallback default for the signing secret.\n    Code:\n      TOKEN_SECRET = os.environ.get(\"TOKEN_SECRET\", \"change-me\")\n  Snippet: app/auth.py:29-32\n    Commentary: Verification relies solely on this secret.\n    Code:\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):\n              return None\n          return json.loads(payload)"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-b937e9a720544d689205b0e71d2a2249",
+   "title": "/export authorizes bulk CUI access by a shared static key, no user identity",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-3",
+    "AC-6",
+    "IA-2"
+   ],
+   "raw": "- sfind-b937e9a720544d689205b0e71d2a2249: /export authorizes bulk CUI access by a shared static key, no user identity [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `/export` returns every asset record to any caller presenting the single static `X-API-Key`; it does not use `require_token`, has no role check, and cannot attribute access to an individual.\n    \n    ##### Applicability\n    AC-3 (enforce approved authorizations), AC-6 (least privilege) and IA-2 / IA-2(5) (individuals must be authenticated before a shared authenticator grants access). Boundary doc marks AC-3, AC-6 and IA-2(x) code-owned.\n    \n    ##### Evidence\n    Lines 71-75: the only gate is a string comparison against `settings.API_KEY` (a literal in source); there is no `Depends(require_token)` and no per-user authorization. By contrast `/assets/{name}` (line 63) requires a token. The comparison uses `!=` rather than a constant-time compare.\n    \n    ##### Impact\n    - Anyone holding the shared key (including anyone with repo read access) can extract all mission readiness/location data.\n    - No individual accountability for exports, compounding the missing audit record.\n  Recommendation: Require an individually authenticated token (Depends(require_token)) plus an explicit export role/permission check on /export; if machine access is needed, use per-client credentials issued by the IdP, compare with hmac.compare_digest, and audit each export with the actor.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:71-75\n    Commentary: Export gated only by a shared static key, no user token or role.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/settings.py:4-4\n    Commentary: The shared key is a literal constant in source.\n    Code:\n      API_KEY = \"mrt-export-7f3a9c2e1b4d5a6f8e9d0c1b2a3f4e5d\""
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-b768e4998357491492457a89f37ecc32",
+   "title": "Container runs privileged as root with no hardening securityContext",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-6",
+    "CM-6",
+    "CM-7",
+    "SI-16"
+   ],
+   "raw": "- sfind-b768e4998357491492457a89f37ecc32: Container runs privileged as root with no hardening securityContext [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    The `mrt` container sets `privileged: true` and `runAsUser: 0`, and omits `runAsNonRoot`, `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem`, capability drops and a seccomp profile.\n    \n    ##### Applicability\n    AC-6 least privilege, CM-6/CM-7 (Kubernetes STIG pod security settings), SI-16 memory protection (seccomp). The boundary doc assigns `k8s/` workload settings to this uplift; cluster/apiserver admission enforcement is inherited.\n    \n    ##### Evidence\n    Lines 16-18 grant full host device access and root. The Dockerfile also has no `USER`, so the image itself runs as root. A web API serving a SQLite in-memory DB needs none of these privileges.\n    \n    ##### Impact\n    - Any RCE in the app (e.g. via dependency flaws) yields root on the node, breaking tenant separation for CUI workloads.\n    - Assumes no Pod Security admission/Kyverno policy rejects the pod; that platform control is outside this repo.\n  Recommendation: Set privileged: false, runAsNonRoot: true, runAsUser: <non-zero>, allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities.drop: [ALL], seccompProfile.type: RuntimeDefault, automountServiceAccountToken: false; add a non-root USER in the Dockerfile.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: k8s/deployment.yaml:16-18\n    Commentary: Privileged, root securityContext with no hardening fields.\n    Code:\n                securityContext:\n                  privileged: true                           # G8: privileged container\n                  runAsUser: 0\n  Snippet: Dockerfile:1-7\n    Commentary: Image defines no non-root USER.\n    Code:\n      FROM python:3.12-slim\n      WORKDIR /srv\n      COPY requirements.txt .\n      RUN pip install --no-cache-dir -r requirements.txt\n      COPY app ./app\n      EXPOSE 8000\n      CMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-8e211180972c483791bf198517421c86",
+   "title": "Export API key hardcoded as a literal in source",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "CM-6",
+    "IA-5"
+   ],
+   "raw": "- sfind-8e211180972c483791bf198517421c86: Export API key hardcoded as a literal in source [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `settings.API_KEY` is a literal string (value [REDACTED], settings.py line 4) committed to the repository and used as the sole authenticator for `/export`.\n    \n    ##### Applicability\n    IA-5(1) / IA-5 authenticator protection and CM-6 configuration settings: authenticators must not be embedded in source. Boundary doc marks IA-5(x) and CM-6 code-owned.\n    \n    ##### Evidence\n    Line 4 defines the key literal; `main.py` line 73 compares the header against it. The value cannot be rotated without a code change and is visible to anyone with repo or image access.\n    \n    ##### Impact\n    - Full bulk export of CUI to anyone with read access to the repo, image layers, or git history.\n    - Key must be treated as compromised and rotated; removal from HEAD does not remove it from history.\n  Recommendation: Remove the literal; load the key from a mounted Kubernetes Secret / secrets manager with no default and fail startup if absent; rotate the exposed key; preferably replace the shared key with per-user token authorization.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/settings.py:4-4\n    Commentary: Literal API key in source (value redacted here).\n    Code:\n      API_KEY = \"mrt-export-7f3a9c2e1b4d5a6f8e9d0c1b2a3f4e5d\"\n  Snippet: app/main.py:73-73\n    Commentary: The literal is the only gate on /export.\n    Code:\n          if x_api_key != settings.API_KEY:"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-8cfe61720de749868329ff77d5dfc0be",
+   "title": "Passwords submitted as URL query parameters, exposed in access logs",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-5",
+    "SC-8"
+   ],
+   "raw": "- sfind-8cfe61720de749868329ff77d5dfc0be: Passwords submitted as URL query parameters, exposed in access logs [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `login(username: str, password: str)` declares scalar parameters, which FastAPI binds from the query string, so the password travels in the request URL (the tests confirm with `params=`).\n    \n    ##### Applicability\n    IA-5(1) password-based authentication requires protecting passwords in transmission and storage; SC-8(1) confidentiality of transmitted authenticators. URLs are recorded by uvicorn's default access log, proxies and ingress logs.\n    \n    ##### Evidence\n    Line 45 declares `password: str` with no `Form`/`Body`, making it a query parameter. `tests/test_app.py` posts with `params=`. The Dockerfile CMD runs uvicorn with default access logging, whose line includes the path with query string, written to stdout alongside audit output.\n    \n    ##### Impact\n    - Plaintext passwords land in container stdout, platform log storage (CloudWatch/Loki) and any ingress access logs.\n    - Assumes uvicorn access logging is not disabled at runtime (no `--no-access-log` in Dockerfile CMD); validation should confirm the log line.\n  Recommendation: Accept credentials in the request body (Pydantic model or Form fields), reject query-string credentials, update tests accordingly, and ensure access logs never include request bodies.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:44-46\n    Commentary: Password bound as a query parameter on POST /login.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n  Snippet: Dockerfile:7-7\n    Commentary: uvicorn started with default access logging enabled.\n    Code:\n      CMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-7cc6bb1419c04cefaa63ec4acf5a3ef7",
+   "title": "Token signing secret committed as plaintext env value in manifest",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "CM-6",
+    "IA-5"
+   ],
+   "raw": "- sfind-7cc6bb1419c04cefaa63ec4acf5a3ef7: Token signing secret committed as plaintext env value in manifest [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `TOKEN_SECRET` is set via a literal `value:` (content [REDACTED], deployment.yaml line 21) in the Deployment rather than a `secretKeyRef` to a Kubernetes Secret.\n    \n    ##### Applicability\n    IA-5(1)/IA-5 authenticator protection and CM-6 (Kubernetes STIG: secrets not stored in environment literals / manifests). The manifest is code-owned per the boundary doc.\n    \n    ##### Evidence\n    Lines 19-21 place the HMAC signing key in source control and in the pod spec, readable by anyone with repo access or `get deployment` RBAC. This is the key `auth.py` uses to sign and verify all bearer tokens.\n    \n    ##### Impact\n    - Anyone with repo read access can forge tokens for any user, bypassing authentication on `/assets/*`.\n    - The value is a short, guessable string; it must be treated as compromised and rotated.\n  Recommendation: Remove the literal; create the secret out-of-band (External Secrets / sealed secret / KMS-backed) and reference it via valueFrom.secretKeyRef or a mounted file; rotate the key with a strong random value.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: k8s/deployment.yaml:19-21\n    Commentary: Signing secret supplied as a plaintext env literal (value redacted).\n    Code:\n                env:\n                  - name: TOKEN_SECRET\n                    value: \"s3cr3t-in-plaintext\"            # G8: secret in env"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-736ff286775847a7b1a5a0ec19b663d3",
+   "title": "Audit records lack timestamp, source IP, actor and outcome fields",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "AU-3"
+   ],
+   "raw": "- sfind-736ff286775847a7b1a5a0ec19b663d3: Audit records lack timestamp, source IP, actor and outcome fields [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    The `audit()` helper writes `AUDIT <event> <detail>` through a logger configured with format `%(message)s`, so records carry no time, source address, actor identity or outcome field.\n    \n    ##### Applicability\n    AU-3 a-f and AU-3(1) with the ISSM-defined fields in `docs/il5/00-boundary.md` (actor, action, object, source IP, UTC time, outcome). The boundary doc lists AU-3/AU-3(1) as code-owned; storage/retention is inherited from the platform.\n    \n    ##### Evidence\n    Line 21 sets the root format to the message only (no `%(asctime)s`, no UTC). Lines 27-29 take only an event name and a free-text detail. Call sites at 48, 51, 67 pass the username or asset name as the sole detail; `get_asset` has the authenticated `claims` but does not record `claims['sub']` as actor, and no call site passes `request.client.host`.\n    \n    ##### Impact\n    - Asset reads of CUI cannot be attributed to a user or source, or placed in time.\n    - After-the-fact investigation relies on platform log-ingest timestamps, which are not part of the record.\n    - Failed-login records log the raw supplied username (could contain mistyped passwords).\n  Recommendation: Change audit() to emit structured JSON records with UTC ISO-8601 timestamp, event type, actor (claims['sub'] or attempted username), object, source IP (request.client.host / X-Forwarded-For from trusted ingress), outcome (success/failure) and a request id; configure the logging formatter with UTC timestamps. Pass Request into handlers to capture source.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:21-22\n    Commentary: Logger format contains only the message: no timestamp or level.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")\n  Snippet: app/main.py:27-29\n    Commentary: Audit helper signature has no actor, source, object or outcome parameters.\n    Code:\n      def audit(event: str, detail: str) -> None:\n          # G7: no actor, source address, outcome or UTC timestamp\n          log.info(\"AUDIT %s %s\", event, detail)\n  Snippet: app/main.py:62-68\n    Commentary: Authenticated asset read audits only the asset name although claims (actor) are available.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-6c84f2c15ef84e5f81059e0cb4adaf32",
+   "title": "Container exposes plain HTTP port 8000; TLS left to platform ingress",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "observation",
+   "criteria_cited": [
+    "SC-8"
+   ],
+   "raw": "- sfind-6c84f2c15ef84e5f81059e0cb4adaf32: Container exposes plain HTTP port 8000; TLS left to platform ingress [low/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: observation\n  Description: ##### Artifact\n    Lines 22-23 declare `containerPort: 8000`; the Dockerfile CMD starts uvicorn on 0.0.0.0:8000 with no TLS options. The manifest defines no Service, Ingress or NetworkPolicy.\n    \n    ##### Bears on\n    SC-8(1) cryptographic protection in transmission. The app hands TLS termination to the platform; `docs/il5/00-boundary.md` notes 'no TLS termination in-app (platform ingress assumed)', so evidence for encryption in transit (and pod-to-ingress mTLS, e.g. Istio in Big Bang) must come from the platform ingress/service-mesh configuration.\n    \n    ##### Limits\n    Does not show whether traffic between ingress and pod is encrypted or whether any network restriction exists for the pod.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: k8s/deployment.yaml:22-23\n    Commentary: Plain container port exposed.\n    Code:\n                ports:\n                  - containerPort: 8000\n  Snippet: Dockerfile:7-7\n    Commentary: uvicorn bound without TLS.\n    Code:\n      CMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-69577cac47814440a0ddc056c868eccd",
+   "title": "Test suite covers only happy paths; no security regression tests or CI",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "SA-11",
+    "SA-15"
+   ],
+   "raw": "- sfind-69577cac47814440a0ddc056c868eccd: Test suite covers only happy paths; no security regression tests or CI [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `pytest.ini` points at `tests/`, whose three tests cover health, a successful login/asset read and a single bad login; no test exercises lockout, session expiry, banner, SQL injection, error leakage, export authorization or audit content, and the repo has no CI or SAST configuration.\n    \n    ##### Applicability\n    SA-11 (developer security testing and evaluation, including flaw remediation verification) and SA-15 (development process and tools). The boundary doc marks SA-11/SA-15 code-owned and states 'No CI workflows in the repo'.\n    \n    ##### Evidence\n    pytest.ini lines 1-3 configure the suite; `tests/test_app.py` contains only `test_healthz`, `test_login_and_asset`, `test_bad_login`. No `.github/`, `.gitlab-ci.yml` or scanner config exists in the repo root.\n    \n    ##### Impact\n    - The control gaps in main.py/settings.py are undetected by the test suite and remediation cannot be regression-verified.\n    - No automated gate runs tests or static analysis before deploy.\n  Recommendation: Add security regression tests (lockout after 3 failures, token expiry after 15 min idle, banner text/ack, SQLi payload rejected, 500 responses contain no traceback, /export denied without user role, audit records contain required fields) and a CI workflow that runs pytest plus SAST/dependency scanning on every change.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: pytest.ini:1-3\n    Commentary: Test configuration pointing to the tests directory.\n    Code:\n      [pytest]\n      pythonpath = .\n      testpaths = tests\n  Snippet: tests/test_app.py:1-19\n    Commentary: Only functional happy-path and a single 401 test.\n    Code:\n      from fastapi.testclient import TestClient\n      \n      from app.main import app\n      \n      client = TestClient(app, raise_server_exceptions=False)\n      \n      \n      def test_healthz():\n          assert client.get(\"/healthz\").json() == {\"ok\": True}\n      \n      \n      def test_login_and_asset():\n          tok = client.post(\"/login\", params={\"username\": \"operator\", \"password\": \"Password1\"}).json()[\"token\"]\n          r = client.get(\"/assets/C-130J-01\", headers={\"Authorization\": f\"Bearer {tok}\"})\n          assert r.status_code == 200 and r.json()[\"status\"] == \"FMC\"\n      \n      \n      def test_bad_login():\n          assert client.post(\"/login\", params={\"username\": \"operator\", \"password\": \"nope\"}).status_code == 401"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-5355279be4f442fcbc62af672cf2bb72",
+   "title": "Audit records written to stdout via stdlib logging, storage handed to platform",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "observation",
+   "criteria_cited": [
+    "AU-9"
+   ],
+   "raw": "- sfind-5355279be4f442fcbc62af672cf2bb72: Audit records written to stdout via stdlib logging, storage handed to platform [low/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: observation\n  Description: ##### Artifact\n    Lines 21-22 configure `logging.basicConfig(level=INFO, format=\"%(message)s\")` and lines 27-29 emit audit events with `log.info` to the process stdout stream; no file, signing, or forwarding handler is configured in-app.\n    \n    ##### Bears on\n    AU-9 a (protection of audit information from modification/deletion) and AU-9 b (alerting). The app hands record storage, integrity and alerting to the container runtime/log collector; `docs/il5/00-boundary.md` names CloudWatch/Loki as inherited storage, so that evidence must come from the platform log pipeline configuration and its access controls.\n    \n    ##### Limits\n    Does not show how stdout is collected, who can modify the stored logs, or whether alerting on tampering exists.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:21-29\n    Commentary: Logger configuration and audit helper writing to stdout.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")\n      \n      app = FastAPI(title=\"Mission Readiness Tracker\", version=\"0.1.0\")\n      \n      \n      def audit(event: str, detail: str) -> None:\n          # G7: no actor, source address, outcome or UTC timestamp\n          log.info(\"AUDIT %s %s\", event, detail)"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-3328f386be164cecb894f0da16e0d6eb",
+   "title": "Deployment pulls image by mutable :latest tag, not digest",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "CM-6",
+    "SR-11",
+    "SR-3"
+   ],
+   "raw": "- sfind-3328f386be164cecb894f0da16e0d6eb: Deployment pulls image by mutable :latest tag, not digest [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    The container image is referenced as `registry.example.mil/mrt:latest`, so the deployed artifact is not tied to a specific reviewed build or SBOM.\n    \n    ##### Applicability\n    SR-3 / SR-11 component authenticity and CM-6 (Kubernetes STIG: images referenced by digest). The repo's SBOM evidence (`docs/il5/evidence/sbom`) is tied to a specific build SHA that this reference cannot guarantee.\n    \n    ##### Evidence\n    Line 15 uses the floating tag with no `@sha256:` digest; no `imagePullPolicy` is set (defaults to Always for :latest).\n    \n    ##### Impact\n    - Whatever image is last pushed to the tag runs in production; a tampered or unreviewed image would deploy silently.\n    - SBOM/vulnerability evidence cannot be bound to the running workload.\n    - Registry signing/admission verification (if any) is outside this repo and was not verified.\n  Recommendation: Reference the image by immutable digest (registry.example.mil/mrt@sha256:<digest> produced by the build that generated the SBOM), and enforce signature verification (cosign/Kyverno) at admission.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: k8s/deployment.yaml:15-15\n    Commentary: Image referenced by mutable latest tag.\n    Code:\n                image: registry.example.mil/mrt:latest      # G8: floating tag, not digest-pinned"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-209d1d2861c24d44a9dda7ed8438927f",
+   "title": "Session idle timeout unset and never enforced; tokens never expire",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-11",
+    "AC-12",
+    "IA-11",
+    "IA-2"
+   ],
+   "raw": "- sfind-209d1d2861c24d44a9dda7ed8438927f: Session idle timeout unset and never enforced; tokens never expire [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `SESSION_IDLE_MINUTES = None` and the setting is referenced nowhere else; tokens carry only `sub` and `iat`, and `verify_token`/`require_token` never check age or idle time, so sessions last forever.\n    \n    ##### Applicability\n    AC-11 / AC-12 with the tailored 15-minute inactivity parameter, IA-11 re-authentication, and IA-2(8) replay resistance (a captured token is replayable indefinitely). Boundary doc marks these code-owned.\n    \n    ##### Evidence\n    settings.py line 6 sets None; repo grep shows no other reference. `auth.issue_token` (auth.py 15-19) sets no `exp`; `auth.verify_token` (auth.py 22-32) returns claims after signature check only; `main.require_token` (main.py 55-59) accepts any validly-signed token.\n    \n    ##### Impact\n    - A stolen or leaked bearer token grants permanent access to CUI asset data.\n    - No server-side session state exists to revoke tokens.\n  Recommendation: Set SESSION_IDLE_MINUTES = 15; track last activity server-side (session id in token -> last_seen) or issue short-lived tokens with sliding renewal, reject when idle > 15 min or absolute lifetime exceeded, add a jti for revocation, and add tests for expiry.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/settings.py:6-6\n    Commentary: Idle timeout configured as None.\n    Code:\n      SESSION_IDLE_MINUTES = None  # G3: unset -> no timeout\n  Snippet: app/auth.py:15-32\n    Commentary: Token issue and verify carry and check no expiry or last-activity.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()\n      \n      \n      def verify_token(token: str):\n          try:\n              p, s = token.split(\".\")\n              payload = base64.urlsafe_b64decode(p)\n              sig = base64.urlsafe_b64decode(s)\n          except Exception:\n              return None\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):\n              return None\n          return json.loads(payload)\n  Snippet: app/main.py:55-59\n    Commentary: Route dependency accepts any validly-signed token regardless of age.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-1d5461de0ff2411cafce9d2419732d18",
+   "title": "Asset path parameter reaches concatenated SQL without validation",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "SI-10"
+   ],
+   "raw": "- sfind-1d5461de0ff2411cafce9d2419732d18: Asset path parameter reaches concatenated SQL without validation [high/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `GET /assets/{name}` passes the raw path parameter to `db.find_asset`, which concatenates it into a SQL string; any authenticated user can inject SQL.\n    \n    ##### Applicability\n    SI-10 (check validity of information inputs). The route is the code-owned entry point for this input; boundary doc marks SI-10 code-owned.\n    \n    ##### Evidence\n    `main.py` line 63-64 accepts `name: str` with no pattern constraint and forwards it. `db.py` line 25 builds `\"... WHERE name = '\" + name + \"'\"` and executes it. Error output from malformed queries is returned to the caller by the handler at main.py 32-35.\n    \n    ```\n    GET /assets/{name} --unvalidated--> db.find_asset --string concat--> sqlite execute\n    ```\n    \n    ##### Impact\n    - Authenticated users can read arbitrary rows/tables, including the `users` table with password hashes (e.g. `' UNION SELECT username,password_hash,'x' FROM users--`).\n    - Requires a valid token, which itself is forgeable if TOKEN_SECRET falls back to its default.\n  Recommendation: Use a parameterized query in find_asset (`WHERE name = ?`, (name,)) and constrain the route parameter with an allow-list pattern (e.g. Path(pattern=r'^[A-Z0-9-]{1,32}$')); add an injection regression test.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:62-64\n    Commentary: Unconstrained path parameter forwarded to the DB layer.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n  Snippet: app/db.py:23-26\n    Commentary: Query built by string concatenation with the user-supplied name.\n    Code:\n      def find_asset(name: str):\n          # G4: SQL injection via string concatenation\n          row = _conn.execute(\"SELECT * FROM assets WHERE name = '\" + name + \"'\").fetchone()\n          return dict(row) if row else None"
+  },
+  {
+   "framework": "nist-800-53-rev5-high",
+   "finding_id": "sfind-0fe0427f43d049809330266730c47ce4",
+   "title": "Login page shows no DoD Notice and Consent Banner before authentication",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-b0d4def03df74cab9c8f66fb8b7316f9",
+   "created_utc": "2026-10-27 09:02:05",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-8"
+   ],
+   "raw": "- sfind-0fe0427f43d049809330266730c47ce4: Login page shows no DoD Notice and Consent Banner before authentication [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-b0d4def03df74cab9c8f66fb8b7316f9 created 2026-10-27 09:02:05 UTC, category: deviation\n  Description: ##### Overview\n    `GET /login` returns only a usage hint and `POST /login` issues a token without any banner display or acknowledgement step; no other route presents the banner.\n    \n    ##### Applicability\n    AC-8 a/b with the ISSM parameter in `docs/il5/00-boundary.md` (standard DoD Notice and Consent Banner text). Boundary doc lists AC-8 as code-owned, and this is the only pre-authentication surface in the app.\n    \n    ##### Evidence\n    Lines 38-41 return the plain text 'POST username/password to /login'. Lines 44-52 authenticate and issue a token with no check that the banner was displayed or acknowledged.\n    \n    ##### Impact\n    - Users access a U.S. Government CUI system without notice of monitoring/consent, weakening legal basis for monitoring and prosecution.\n    - No record of banner acknowledgement exists.\n    - Assumes no upstream ingress/IdP (e.g. Keycloak) renders the banner; that could not be verified from this repo.\n  Recommendation: Return the standard DoD Notice and Consent Banner text from GET /login and require an explicit acknowledgement (e.g. an `accept_banner=true` field or a banner-ack nonce) on POST /login before issuing a token; audit the acknowledgement.\n  Scan session: 38ff0d94a9924dec96a87272c07ccc21\n  Snippet: app/main.py:38-41\n    Commentary: Pre-authentication page returns no banner text.\n    Code:\n      @app.get(\"/login\", response_class=PlainTextResponse)\n      def login_page():\n          # G6: no DoD Notice and Consent Banner before authentication\n          return \"POST username/password to /login\"\n  Snippet: app/main.py:44-52\n    Commentary: Login issues a token without requiring banner acknowledgement.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-e6eef08956854d2893efc6a950ba996a",
+   "title": "CUI asset and export JSON responses carry no CUI marking",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-e6eef08956854d2893efc6a950ba996a: CUI asset and export JSON responses carry no CUI marking [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    `GET /assets/{name}` and `GET /export` return mission readiness rows as plain JSON with no CUI banner field or header.\n    \n    ##### Applicability\n    \n    SRG-IL5-CUI (DoDI 5200.48): CUI output from API responses and exports must be marked. The boundary doc classifies readiness status of named aircraft as CUI.\n    \n    ##### Evidence\n    \n    main.py:62-68 returns the raw asset row; main.py:71-75 returns all rows under `assets`. Neither adds a marking field or response header, and no middleware in main.py adds one.\n    \n    ##### Impact\n    \n    - All CUI leaving the API is unmarked, so downstream consumers and exports lose handling instructions.\n    - Assumed no gateway adds markings; not visible in repo.\n  Recommendation: Add a CUI marking to every CUI response (e.g. a `CUI` banner field in the JSON envelope and a response header via middleware) including exports.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:62-68\n    Commentary: Asset response returned without marking.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row\n  Snippet: app/main.py:71-75\n    Commentary: Bulk export returned without marking.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/db.py:9-11\n    Commentary: Asset table and seeded rows (aircraft, status, location) that constitute the CUI.\n    Code:\n          CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT NOT NULL);\n          CREATE TABLE assets (name TEXT PRIMARY KEY, status TEXT NOT NULL, location TEXT NOT NULL);\n          INSERT INTO assets VALUES ('C-130J-01','FMC','Little Rock'),('C-130J-02','NMC','Ramstein'),('KC-46-07','PMC','McConnell');"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-d2baf3e161e04548928a15a2672fd1e2",
+   "title": "No logout/revocation and require_token never checks token age",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-11",
+    "AC-12",
+    "SC-23",
+    "SRG-IL5-SESSION"
+   ],
+   "raw": "- sfind-d2baf3e161e04548928a15a2672fd1e2: No logout/revocation and require_token never checks token age [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    Tokens are accepted forever: `require_token` only verifies the HMAC, and the app has no logout or revocation endpoint.\n    \n    ##### Applicability\n    \n    SRG-IL5-SESSION: 15-minute server-side idle timeout; tokens must expire and be invalidated on logout. AC-11/AC-12/SC-23 are code-owned.\n    \n    ##### Evidence\n    \n    main.py:55-59 accepts any token for which `auth.verify_token` returns claims; auth.py:22-32 checks only the signature (no `exp`/`iat` comparison). No `/logout` route exists in main.py.\n    \n    ##### Impact\n    \n    - A stolen token grants permanent CUI access; there is no way to terminate a session.\n    - Session timeout events cannot be audited because none occur.\n  Recommendation: Add `exp` and last-activity tracking, enforce 15-minute idle expiry in `require_token`, and add a logout endpoint that revokes the token server-side.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:55-59\n    Commentary: Token dependency with no age or revocation check.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims\n  Snippet: app/auth.py:22-32\n    Commentary: verify_token checks signature only.\n    Code:\n      def verify_token(token: str):\n          try:\n              p, s = token.split(\".\")\n              payload = base64.urlsafe_b64decode(p)\n              sig = base64.urlsafe_b64decode(s)\n          except Exception:\n              return None\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):\n              return None\n          return json.loads(payload)"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-c295e6616dc443618872759835d35844",
+   "title": "audit() records lack actor, source IP, UTC time and outcome; events unaudited",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "AU-12",
+    "AU-2",
+    "AU-3",
+    "SRG-IL5-AUDIT-CONTENT"
+   ],
+   "raw": "- sfind-c295e6616dc443618872759835d35844: audit() records lack actor, source IP, UTC time and outcome; events unaudited [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    `audit()` logs only an event name and one free-text detail, with a log format of bare `%(message)s`. Several security-relevant events (export, token rejection, forbidden export) emit no audit record at all.\n    \n    ##### Applicability\n    \n    SRG-IL5-AUDIT-CONTENT: ISSM parameters require actor, action, object, source IP, UTC timestamp and outcome for logon success/failure, data reads/changes and similar events. AU-2/AU-3/AU-12 are code-owned per docs/il5/00-boundary.md.\n    \n    ##### Evidence\n    \n    - main.py:21 sets `format=\"%(message)s\"` so no timestamp is emitted; main.py:27-29 takes no actor, source address or outcome.\n    - main.py:67 `asset_read` records the asset name but not the token subject (`claims['sub']`) or `request.client.host`.\n    - main.py:71-75 `/export` (bulk CUI read) writes no audit record on success or on the 403 path; main.py:55-59 token rejection is unaudited.\n    \n    ##### Impact\n    \n    - Lost record: who read which CUI asset, from where, when; bulk export is entirely untraced.\n    - Login failures are recorded only by username, so lockout analysis has no source data.\n  Recommendation: Make `audit()` emit structured JSON with actor, action, object, source IP (from `Request`), UTC ISO-8601 timestamp and outcome; call it on login ok/fail, token rejection, asset read, export success/deny.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:21-22\n    Commentary: Log format omits timestamp.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")\n  Snippet: app/main.py:27-29\n    Commentary: Audit function carries only event and detail.\n    Code:\n      def audit(event: str, detail: str) -> None:\n          # G7: no actor, source address, outcome or UTC timestamp\n          log.info(\"AUDIT %s %s\", event, detail)\n  Snippet: app/main.py:62-68\n    Commentary: Asset read audit omits actor and source.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row\n  Snippet: app/main.py:71-75\n    Commentary: Export path emits no audit record.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/main.py:55-59\n    Commentary: Token rejection emits no audit record.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-be3f190daf744b7e99c730705c742059",
+   "title": "Password accepted as URL query parameter on POST /login",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-5",
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-be3f190daf744b7e99c730705c742059: Password accepted as URL query parameter on POST /login [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    `login(username: str, password: str)` declares plain scalar parameters, which FastAPI binds from the query string, so the password travels in the URL.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS (IA-5 protection of authenticators): authenticators must not be exposed in plaintext to logs or other destinations.\n    \n    ##### Evidence\n    \n    main.py:44-45: scalar parameters on a POST without `Body`/`Form` are query parameters. URLs are recorded by uvicorn access logs, proxies and ingress logs.\n    \n    ##### Impact\n    \n    - Plaintext passwords can land in access logs collected by the platform log store (1-year retention).\n    - Exact access-log configuration in deployment is not visible in repo.\n  Recommendation: Accept credentials in a request body (`Form` or a Pydantic body model) and reject query-string credentials.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-45\n    Commentary: Password bound from query string.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-9c07aca070fa46b48baf3db2435db84c",
+   "title": "Module docstring planted-gap register (G1-G8)",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "observation",
+   "criteria_cited": [
+    "AC-11",
+    "AC-12",
+    "AC-8",
+    "AU-12",
+    "AU-3",
+    "CM-5",
+    "IA-5",
+    "SC-13",
+    "SI-10",
+    "SI-11",
+    "SR-3",
+    "SRG-IL5-AUDIT-CONTENT",
+    "SRG-IL5-BANNER",
+    "SRG-IL5-CRYPTO",
+    "SRG-IL5-CUI",
+    "SRG-IL5-SECRETS",
+    "SRG-IL5-SESSION"
+   ],
+   "raw": "- sfind-9c07aca070fa46b48baf3db2435db84c: Module docstring planted-gap register (G1-G8) [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: observation\n  Description: ##### Artifact\n    \n    main.py:3-11 is a docstring listing eight seeded gaps with control references and code locations (MD5 hashing, hard-coded API key, no idle timeout, SQL concatenation, stack trace to client, no consent banner, audit fields missing, privileged pod/latest tag/secret in env).\n    \n    ##### Bears on\n    \n    Document artifact referencing SRG-IL5-CRYPTO, SRG-IL5-SECRETS, SRG-IL5-SESSION, SRG-IL5-CUI, SRG-IL5-BANNER and SRG-IL5-AUDIT-CONTENT locations.\n    \n    ##### Limits\n    \n    A developer note only; it does not change behavior or record remediation status.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:3-11\n    Commentary: Planted-gap register.\n    Code:\n      Planted gaps (do not fix here; the uplift PRs fix them):\n        G1 MD5 password hashing            (IA-5(1), SC-13, ASD STIG password storage)      -> auth.hash_password\n        G2 Hardcoded API key                (IA-5(7), CWE-798)                               -> settings.API_KEY\n        G3 No idle session timeout         (AC-11/AC-12, ASD STIG 15-min idle)              -> auth.issue_token\n        G4 SQL built by string concat      (SI-10, CWE-89)                                   -> db.find_asset\n        G5 Stack trace returned to client  (SI-11, CWE-209)                                  -> main.debug_exception_handler\n        G6 No DoD consent banner           (AC-8)                                            -> GET /login has no banner\n        G7 Audit log missing who/where     (AU-3, AU-12)                                     -> main.audit\n        G8 Privileged pod, latest tag, secret in env (K8s STIG, CM-5(6), SR-3)              -> k8s/deployment.yaml"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-99cceb585d9541e399767d672d536777",
+   "title": "Login has no failed-attempt counting or account lockout",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-7",
+    "SRG-IL5-LOCKOUT"
+   ],
+   "raw": "- sfind-99cceb585d9541e399767d672d536777: Login has no failed-attempt counting or account lockout [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    `POST /login` returns 401 on bad credentials without tracking attempts, so unlimited guessing is possible.\n    \n    ##### Applicability\n    \n    SRG-IL5-LOCKOUT: ISSM parameter requires lockout after 3 consecutive invalid attempts within 15 minutes, for 15 minutes. AC-7 is code-owned per docs/il5/00-boundary.md.\n    \n    ##### Evidence\n    \n    main.py:46-49 checks the password and raises 401; no counter, timestamp or lock state is read or written, and the `users` table (db.py:9) has no lockout columns.\n    \n    ##### Impact\n    \n    - Password guessing against the seeded `operator` account is unbounded.\n    - No lockout events exist to audit.\n  Recommendation: Track failed attempts per account (timestamped), lock after 3 within 15 minutes for 15 minutes, reject logins while locked, and audit lockout events.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-52\n    Commentary: Login path with no attempt tracking.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}\n  Snippet: app/db.py:9-9\n    Commentary: User table without lockout state.\n    Code:\n          CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT NOT NULL);"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-960e6b3abb954a1abba8e742748c71ae",
+   "title": "/export authenticates by shared static API key with no user identity",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-PKI",
+    "SRG-IL5-PRIV-ACCESS"
+   ],
+   "raw": "- sfind-960e6b3abb954a1abba8e742748c71ae: /export authenticates by shared static API key with no user identity [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    Bulk export of all CUI assets is gated only by comparing an `X-Api-Key` header to one shared key; no user, role or PKI identity is established.\n    \n    ##### Applicability\n    \n    SRG-IL5-PKI: shared static API-key authentication is a gap; SRG-IL5-PRIV-ACCESS: privileged functions must be role-gated and configurable. DoD PKI/Keycloak is the inherited IdP per docs/il5/00-boundary.md, but this endpoint does not use it.\n    \n    ##### Evidence\n    \n    main.py:71-74 compares the header to `settings.API_KEY` (hard-coded at settings.py:4) with plain `!=`; no `require_token`, role claim or IdP check is on the path.\n    \n    ##### Impact\n    \n    - Anyone holding the key (it is in source) can export all CUI; actions cannot be attributed to an individual.\n    - The key cannot be scoped to authorized US-person administrators by the IdP.\n  Recommendation: Require an IdP-issued (DoD PKI/Keycloak) token with an export/admin role claim on `/export`; remove the static API key.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:71-75\n    Commentary: Export gated only by shared key comparison.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/settings.py:3-4\n    Commentary: The shared key is a literal in source.\n    Code:\n      # G2: hardcoded credential checked into source\n      API_KEY = \"mrt-export-7f3a9c2e1b4d5a6f8e9d0c1b2a3f4e5d\""
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-8fe792c9ca06460db93af8dfab60910b",
+   "title": "Container exposes plain port 8000 with no Service/TLS in repo",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-TRANSIT"
+   ],
+   "raw": "- sfind-8fe792c9ca06460db93af8dfab60910b: Container exposes plain port 8000 with no Service/TLS in repo [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: observation\n  Description: ##### Artifact\n    \n    deployment.yaml:22-23 declares `containerPort: 8000`; the app (uvicorn) serves HTTP with no TLS settings, and the repo contains no Service, Ingress or mesh configuration. docs/il5/00-boundary.md records 'no TLS termination in-app (platform ingress assumed)'.\n    \n    ##### Bears on\n    \n    SRG-IL5-TRANSIT: TLS for CUI in transit is handed off to the platform (Platform One ingress / service mesh). Evidence of TLS 1.2+ with FIPS ciphers end-to-end, including pod-to-ingress mTLS, must come from the platform ingress/Istio configuration.\n    \n    ##### Limits\n    \n    Does not show any TLS configuration or whether the port is reachable outside the pod network.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: k8s/deployment.yaml:22-23\n    Commentary: Plain HTTP container port.\n    Code:\n                ports:\n                  - containerPort: 8000"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-7f81e912cfe64e5d91285e04694d9081",
+   "title": "Global exception handler returns exception text and traceback to clients",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-7f81e912cfe64e5d91285e04694d9081: Global exception handler returns exception text and traceback to clients [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    The catch-all handler `debug_exception_handler` returns `str(exc)` and the full `traceback.format_exc()` in every 500 response. No configuration flag gates it, so it is active in all environments.\n    \n    ##### Applicability\n    \n    SRG-IL5-CUI: the application must not write CUI to error messages. The service handles CUI (mission readiness status of named aircraft, per docs/il5/00-boundary.md), and this is the only error handler for unexpected exceptions on every route.\n    \n    ##### Evidence\n    \n    main.py:32-35 registers the handler for `Exception` and puts the exception message and traceback in the JSON body. Unhandled errors on CUI routes (e.g. sqlite3 errors raised from `db.find_asset`, db.py:23-26, reached from `GET /assets/{name}`) carry SQL text, file paths and code lines back to the caller.\n    \n    ```\n    GET /assets/<name> --> db.find_asset (concatenated SQL) --sqlite3 error--> debug_exception_handler --> {error, trace} to client\n    ```\n    \n    ##### Impact\n    \n    - Affects every route; internal paths, SQL statements and values from CUI queries can leak in error bodies.\n    - Assumed: no proxy strips 500 bodies in front of the pod; not verifiable from the repo.\n  Recommendation: Return a generic error body (e.g. `{\"error\": \"internal error\", \"id\": <correlation id>}`) and log the traceback server-side, without CUI values.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:32-35\n    Commentary: Catch-all handler returns exception string and traceback in the response body.\n    Code:\n      @app.exception_handler(Exception)\n      async def debug_exception_handler(request: Request, exc: Exception):\n          # G5: internals leak to the client\n          return JSONResponse(status_code=500, content={\"error\": str(exc), \"trace\": traceback.format_exc()})\n  Snippet: app/db.py:23-26\n    Commentary: CUI query path whose failures are surfaced through the handler.\n    Code:\n      def find_asset(name: str):\n          # G4: SQL injection via string concatenation\n          row = _conn.execute(\"SELECT * FROM assets WHERE name = '\" + name + \"'\").fetchone()\n          return dict(row) if row else None"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-7f41c93945ce41ee8bbe556e729d9adc",
+   "title": "POST /login uses local username/password, not DoD PKI/CAC",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-2",
+    "SRG-IL5-PKI"
+   ],
+   "raw": "- sfind-7f41c93945ce41ee8bbe556e729d9adc: POST /login uses local username/password, not DoD PKI/CAC [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    User authentication is a local password check against the in-app `users` table; no CAC/PIV or IdP federation exists in the app.\n    \n    ##### Applicability\n    \n    SRG-IL5-PKI: user authentication must use DoD PKI via the inherited DoD PKI/Keycloak IdP; local password-only authentication is a gap. IA-2(x) is code-owned per docs/il5/00-boundary.md (the IdP is inherited, its integration is not).\n    \n    ##### Evidence\n    \n    main.py:44-52 looks up `db.get_user` and compares `auth.hash_password(password)` to the stored hash, then issues its own HMAC token (auth.py:15-19). No OIDC/SAML or client-certificate handling is present.\n    \n    ##### Impact\n    \n    - All CUI reads are protected by a single-factor password (seeded user at db.py:14).\n    - Whether an ingress enforces mTLS/CAC in front of the app cannot be seen in the repo.\n  Recommendation: Replace local login with OIDC/SAML federation to the DoD PKI/Keycloak IdP and validate IdP-issued tokens in `require_token`.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-52\n    Commentary: Local password login issuing an app token.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}\n  Snippet: app/auth.py:15-19\n    Commentary: App-minted token instead of IdP token.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-7c727129093245ecb173c491301989be",
+   "title": "Export API key hard-coded as a literal in settings.py",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-5",
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-7c727129093245ecb173c491301989be: Export API key hard-coded as a literal in settings.py [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    `API_KEY` is a string literal committed to source and is the sole credential protecting `/export`.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS: no API keys hard-coded in source; must load from Kubernetes Secrets/external store. IA-5(7) is code-owned.\n    \n    ##### Evidence\n    \n    settings.py:4 assigns the key literal ([REDACTED]); main.py:73 compares the header against it.\n    \n    ##### Impact\n    \n    - Anyone with repo access (and git history) can export all CUI.\n    - The value persists in history and must be rotated.\n  Recommendation: Remove the literal; read the key from a Kubernetes Secret with no default and fail startup if absent (preferably replace with IdP auth), and rotate the exposed key.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/settings.py:3-4\n    Commentary: Literal API key in source (value redacted).\n    Code:\n      # G2: hardcoded credential checked into source\n      API_KEY = \"mrt-export-7f3a9c2e1b4d5a6f8e9d0c1b2a3f4e5d\"\n  Snippet: app/main.py:71-74\n    Commentary: Export authorization uses this key.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-761247cb324d4ebc98a3c1ea67722244",
+   "title": "GET /login returns no DoD Notice and Consent Banner or acknowledgement",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-8",
+    "SRG-IL5-BANNER"
+   ],
+   "raw": "- sfind-761247cb324d4ebc98a3c1ea67722244: GET /login returns no DoD Notice and Consent Banner or acknowledgement [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    The pre-authentication `GET /login` response is a one-line usage hint; `POST /login` issues a token without any banner acknowledgement.\n    \n    ##### Applicability\n    \n    SRG-IL5-BANNER: ISSM parameter (docs/il5/00-boundary.md) requires the standard DoD Notice and Consent Banner text before access with acknowledgement. AC-8 is listed as code-owned in the boundary doc, and `/login` is the app's only pre-auth entry point.\n    \n    ##### Evidence\n    \n    main.py:38-41 returns `POST username/password to /login` (observed text) instead of the standard banner text beginning 'You are accessing a U.S. Government (USG) Information System (IS)...'. main.py:44-52 accepts credentials and returns a token with no acknowledgement parameter or check.\n    \n    ##### Impact\n    \n    - Users and the `/export` caller reach CUI with no notice of monitoring/consent.\n    - No other banner source (ingress, IdP) is configured in the repo; if the platform displays one, that must be evidenced separately.\n  Recommendation: Return the verbatim standard DoD Notice and Consent Banner from `GET /login` and require an explicit acknowledgement field (e.g. `banner_ack=true`) on `POST /login`, rejecting logins without it.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:38-41\n    Commentary: Pre-auth response text with no banner.\n    Code:\n      @app.get(\"/login\", response_class=PlainTextResponse)\n      def login_page():\n          # G6: no DoD Notice and Consent Banner before authentication\n          return \"POST username/password to /login\"\n  Snippet: app/main.py:44-52\n    Commentary: Login issues a token with no banner acknowledgement check.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-6b9a0d298dac4eb1a29bc78614163a87",
+   "title": "TOKEN_SECRET falls back to hard-coded default 'change-me'",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-6b9a0d298dac4eb1a29bc78614163a87: TOKEN_SECRET falls back to hard-coded default 'change-me' [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    If the `TOKEN_SECRET` environment variable is unset, the HMAC token signing key silently becomes a known literal.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS: signing keys must not be hard-coded and must come from a secret store.\n    \n    ##### Evidence\n    \n    settings.py:5 uses `os.environ.get(\"TOKEN_SECRET\", \"change-me\")`; auth.py:18 and :29 sign/verify tokens with it.\n    \n    ##### Impact\n    \n    - With the default, anyone can forge bearer tokens for any `sub` and read CUI.\n    - Whether deployment always sets the variable is a runtime matter (k8s/deployment.yaml sets it as a plaintext value).\n  Recommendation: Use `os.environ[\"TOKEN_SECRET\"]` (no default), fail fast at startup when missing, and source it from a Kubernetes Secret.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/settings.py:5-5\n    Commentary: Signing key env lookup with literal fallback.\n    Code:\n      TOKEN_SECRET = os.environ.get(\"TOKEN_SECRET\", \"change-me\")\n  Snippet: app/auth.py:15-19\n    Commentary: Token signing uses TOKEN_SECRET.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-64a3fe7877b048898e8b4a846edf2d32",
+   "title": "Container securityContext privileged:true and runAsUser:0",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-PRIV-ACCESS"
+   ],
+   "raw": "- sfind-64a3fe7877b048898e8b4a846edf2d32: Container securityContext privileged:true and runAsUser:0 [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: observation\n  Description: ##### Artifact\n    \n    deployment.yaml:16-18 sets `privileged: true` and `runAsUser: 0` for the `mrt` container; image is `registry.example.mil/mrt:latest` (line 15), not digest-pinned.\n    \n    ##### Bears on\n    \n    SRG-IL5-PRIV-ACCESS: the workload runs with root and host-privileged rights independent of app-level role gating; cluster admission policy (Pod Security / Kyverno) is platform configuration whose evidence must come from the platform.\n    \n    ##### Limits\n    \n    Does not show whether an admission controller rejects this pod spec at deploy time.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: k8s/deployment.yaml:15-18\n    Commentary: Privileged root container with floating tag.\n    Code:\n                image: registry.example.mil/mrt:latest      # G8: floating tag, not digest-pinned\n                securityContext:\n                  privileged: true                           # G8: privileged container\n                  runAsUser: 0"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-505bad0e0e334dc3afa5a7154772add6",
+   "title": "SESSION_IDLE_MINUTES set to None; idle timeout never configured",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SESSION"
+   ],
+   "raw": "- sfind-505bad0e0e334dc3afa5a7154772add6: SESSION_IDLE_MINUTES set to None; idle timeout never configured [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    The only session-timeout setting is `None` and is not referenced anywhere in the code.\n    \n    ##### Applicability\n    \n    SRG-IL5-SESSION: ISSM parameter requires a 15-minute server-side idle timeout.\n    \n    ##### Evidence\n    \n    settings.py:6 sets `SESSION_IDLE_MINUTES = None`; auth.py `issue_token`/`verify_token` (lines 15-32) never read it. Observed: none; required: 15 minutes.\n    \n    ##### Impact\n    \n    - Sessions never time out on inactivity on any route.\n  Recommendation: Set `SESSION_IDLE_MINUTES = 15` (configurable, no `None`) and enforce it in `verify_token`/`require_token`.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/settings.py:6-6\n    Commentary: Idle timeout unset.\n    Code:\n      SESSION_IDLE_MINUTES = None  # G3: unset -> no timeout\n  Snippet: app/auth.py:15-32\n    Commentary: Token issue/verify ignore the setting.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()\n      \n      \n      def verify_token(token: str):\n          try:\n              p, s = token.split(\".\")\n              payload = base64.urlsafe_b64decode(p)\n              sig = base64.urlsafe_b64decode(s)\n          except Exception:\n              return None\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):\n              return None\n          return json.loads(payload)"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-4c32d871862f401f9649464029e813c7",
+   "title": "Deployment sets TOKEN_SECRET as plaintext env value in manifest",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-4c32d871862f401f9649464029e813c7: Deployment sets TOKEN_SECRET as plaintext env value in manifest [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: deviation\n  Description: ##### Overview\n    \n    The token signing key is embedded as a literal `value:` in the Deployment manifest rather than referenced from a Secret.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS: no signing keys in Kubernetes manifests including plaintext env values; use Kubernetes Secrets.\n    \n    ##### Evidence\n    \n    deployment.yaml:20-21 sets `TOKEN_SECRET` to a literal ([REDACTED]); settings.py:5 consumes it as the HMAC signing key.\n    \n    ##### Impact\n    \n    - Anyone with repo or Deployment read access can forge tokens and read CUI.\n    - The value must be rotated since it is in git history.\n  Recommendation: Replace with `valueFrom.secretKeyRef` pointing at a Kubernetes Secret (or external secret store), and rotate the key.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: k8s/deployment.yaml:19-21\n    Commentary: Plaintext secret env value (redacted).\n    Code:\n                env:\n                  - name: TOKEN_SECRET\n                    value: \"s3cr3t-in-plaintext\"            # G8: secret in env\n  Snippet: app/settings.py:5-5\n    Commentary: Value becomes the token signing key.\n    Code:\n      TOKEN_SECRET = os.environ.get(\"TOKEN_SECRET\", \"change-me\")"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-14650026afae4c44b68502714dbe4892",
+   "title": "Audit logging via logging.basicConfig to process stream",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:46",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-AUDIT-RETENTION"
+   ],
+   "raw": "- sfind-14650026afae4c44b68502714dbe4892: Audit logging via logging.basicConfig to process stream [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:46 UTC, category: observation\n  Description: ##### Artifact\n    \n    main.py:21-22 configures the stdlib root logger with `logging.basicConfig(level=logging.INFO, format=\"%(message)s\")` and logger `mrt`; `audit()` writes through it. basicConfig with no filename attaches a StreamHandler to stderr; no file handler or rotation is configured in the repo.\n    \n    ##### Bears on\n    \n    SRG-IL5-AUDIT-RETENTION: audit records are emitted to the container stream for platform collection. Retention is handed to the platform log store (CloudWatch/Loki per docs/il5/00-boundary.md); retention evidence must come from that platform's configuration.\n    \n    ##### Limits\n    \n    Does not show that a collector scrapes the stream, nor its retention period.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:21-22\n    Commentary: Logger configured to a stream with no local rotation.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-f7b04b70a5bb4057be5b79b23fbefd75",
+   "title": "users schema has no password age, history, or length enforcement",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-PASSWORD"
+   ],
+   "raw": "- sfind-f7b04b70a5bb4057be5b79b23fbefd75: users schema has no password age, history, or length enforcement [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    The `users` table stores only `username` and `password_hash`; no column or code path records password set date or prior hashes, and no code enforces a minimum length, so the 60-day lifetime, 24-generation history and 15-character minimum cannot be enforced. Relevant only while local passwords remain (PKI migration would retire them).\n    \n    ##### Applicability\n    SRG-IL5-PASSWORD ISSM parameters: 15 chars min, 60-day max lifetime, 24 history.\n    \n    ##### Evidence\n    - `app/db.py:9` schema lacks `password_changed_at`/history; no password-set or change function exists in `app/` (only `hash_password` in `app/auth.py:10-12`).\n    \n    ##### Impact\n    - Passwords never expire and can be reused; short passwords are accepted (seed is 9 chars).\n  Recommendation: Prefer retiring local passwords in favor of CAC/Keycloak. If kept, add `password_changed_at` and a `password_history` table, enforce len>=15 and last-24 reuse checks in a set-password function, and force change at login when older than 60 days.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/db.py:9-9\n    Commentary: Users table with only username and hash.\n    Code:\n          CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT NOT NULL);"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-f133bb95bf084949b91c51a42dd6e1de",
+   "title": "Login has no failed-attempt counting or account lockout",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-7",
+    "SRG-IL5-LOCKOUT"
+   ],
+   "raw": "- sfind-f133bb95bf084949b91c51a42dd6e1de: Login has no failed-attempt counting or account lockout [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    A failed login emits an audit line and returns 401, but nothing counts consecutive failures or locks the account, so unlimited password guessing is possible.\n    \n    ##### Applicability\n    SRG-IL5-LOCKOUT ISSM parameters: lock after 3 invalid attempts within 15 minutes for 15 minutes; AC-7 is code-owned per `docs/il5/00-boundary.md`.\n    \n    ##### Evidence\n    - `app/main.py:46-49` has no counter, lock check, or lock state; `app/db.py:9` has no lockout columns.\n    \n    ##### Impact\n    - Online brute force against `operator` (weak seeded password) is unthrottled; no lockout events exist to audit.\n  Recommendation: Track failures per username with timestamps; on the 3rd within 15 min set locked_until = now+15 min, reject logins while locked (even with a correct password), audit lockout events, and reset on success. Or delegate to Keycloak brute-force detection configured to these parameters when moving to the IdP.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-52\n    Commentary: Login failure path with no attempt tracking.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}\n  Snippet: app/db.py:9-9\n    Commentary: No failed_attempts/locked_until fields.\n    Code:\n          CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT NOT NULL);"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-e9c347b5c4524fa0a8ffd5ff8e9d1594",
+   "title": "HMAC-SHA256 token signing with constant-time verification",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-CRYPTO"
+   ],
+   "raw": "- sfind-e9c347b5c4524fa0a8ffd5ff8e9d1594: HMAC-SHA256 token signing with constant-time verification [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: observation\n  Description: ##### Artifact\n    `issue_token` signs the JSON payload with `hmac.new(key, payload, hashlib.sha256)`; `verify_token` recomputes the HMAC-SHA256 and compares with `hmac.compare_digest`, returning None on mismatch or malformed input.\n    \n    ##### Bears on\n    SRG-IL5-CRYPTO (token signing/HMAC algorithm). The cryptographic module executing it is the Python/OpenSSL in the `Dockerfile` base image; module validation evidence must come from the image build.\n    \n    ##### Limits\n    Shows the algorithm only, not whether the runtime OpenSSL is a FIPS-validated module or how the key is generated and protected.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/auth.py:18-30\n    Commentary: HMAC-SHA256 sign and compare_digest verify.\n    Code:\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()\n      \n      \n      def verify_token(token: str):\n          try:\n              p, s = token.split(\".\")\n              payload = base64.urlsafe_b64decode(p)\n              sig = base64.urlsafe_b64decode(s)\n          except Exception:\n              return None\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-e8556a697e75414d87163576cab74547",
+   "title": "stdlib logging basicConfig to stdout for audit records",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-AUDIT-RETENTION"
+   ],
+   "raw": "- sfind-e8556a697e75414d87163576cab74547: stdlib logging basicConfig to stdout for audit records [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: observation\n  Description: ##### Artifact\n    `logging.basicConfig(level=logging.INFO, format=\"%(message)s\")` configures the root handler as a StreamHandler (stderr default); `audit()` emits via logger `mrt`. No file handler or rotation is configured in the app.\n    \n    ##### Bears on\n    SRG-IL5-AUDIT-RETENTION (emit to platform collector, no local truncation). One-year retention is handed to the platform log storage (CloudWatch/Loki per `docs/il5/00-boundary.md`); retention evidence must come from that platform configuration.\n    \n    ##### Limits\n    Does not show the collector picks up the container stream, records are structured, or retention period configured.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:21-22\n    Commentary: Logging configured to the process stream with no file/rotation handler.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-e355037213e24a7a943c5b0a90804cb8",
+   "title": "Global exception handler returns exception text and traceback to client",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-e355037213e24a7a943c5b0a90804cb8: Global exception handler returns exception text and traceback to client [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    The catch-all exception handler returns `str(exc)` and the full Python traceback in the 500 response body, exposing internals (file paths, SQL text, data values) to any caller.\n    \n    ##### Applicability\n    SRG-IL5-CUI: CUI must not be written to error messages. Exceptions on the asset path include the SQL query with CUI-table context.\n    \n    ##### Evidence\n    - `app/main.py:32-35` registers the handler for all exceptions.\n    - Reachable via `app/db.py:25` when a crafted name causes a sqlite syntax error.\n    \n    ##### Impact\n    - Internal structure and data values leak; aids SQL injection exploitation.\n  Recommendation: Return a generic `{\"error\": \"internal error\", \"id\": <correlation id>}` and log the traceback server-side (without CUI values) with the correlation id.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:32-35\n    Commentary: Exception text and traceback returned to client.\n    Code:\n      @app.exception_handler(Exception)\n      async def debug_exception_handler(request: Request, exc: Exception):\n          # G5: internals leak to the client\n          return JSONResponse(status_code=500, content={\"error\": str(exc), \"trace\": traceback.format_exc()})"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-daed553023f746f3a810b8cf1c8df1da",
+   "title": "find_asset concatenates input into SQL on the CUI assets table",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-daed553023f746f3a810b8cf1c8df1da: find_asset concatenates input into SQL on the CUI assets table [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    `find_asset` builds its query by string concatenation of the URL path parameter, letting any authenticated caller run arbitrary SQL against the CUI `assets` table; malformed input raises a sqlite error whose SQL text is returned to the client by the global exception handler.\n    \n    ##### Applicability\n    SRG-IL5-CUI: CUI must not reach unauthorized destinations or error messages. The assets table holds the system's CUI (mission readiness of named aircraft, per `docs/il5/00-boundary.md`). The profile names no separate input-validation criterion; this is judged under CUI disclosure.\n    \n    ##### Evidence\n    - `app/db.py:25` concatenates `name` into the SELECT.\n    - `app/main.py:62-64` passes the raw path parameter.\n    - `app/main.py:32-35` returns `str(exc)` and the traceback (including the query) on sqlite errors.\n    \n    ##### Impact\n    - Input such as `x' OR '1'='1` returns rows the caller did not name; UNION payloads can read the `users` table (password hashes).\n    - Bounded to holders of a valid token (which, given the default signing key, may be anyone).\n  Recommendation: Use a parameterized query: `_conn.execute(\"SELECT * FROM assets WHERE name = ?\", (name,))`, and validate `name` against an allowed pattern.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/db.py:23-26\n    Commentary: Unparameterized query on CUI table.\n    Code:\n      def find_asset(name: str):\n          # G4: SQL injection via string concatenation\n          row = _conn.execute(\"SELECT * FROM assets WHERE name = '\" + name + \"'\").fetchone()\n          return dict(row) if row else None\n  Snippet: app/main.py:62-64\n    Commentary: Path parameter flows directly into find_asset.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-ac194bbcc8c54053991ca58bdba0c9d8",
+   "title": "Runtime image python:3.12-slim provides no FIPS-validated crypto module",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CRYPTO"
+   ],
+   "raw": "- sfind-ac194bbcc8c54053991ca58bdba0c9d8: Runtime image python:3.12-slim provides no FIPS-validated crypto module [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    The only container image is built `FROM python:3.12-slim`, whose OpenSSL/hashlib is not configured in FIPS mode, so every cryptographic call in the app (HMAC token signing, password hashing) runs on a non-validated module. Whether a FIPS base is substituted at build time elsewhere could not be determined from the repo.\n    \n    ##### Applicability\n    SRG-IL5-CRYPTO requires security functions to use FIPS 140-2/140-3 validated modules, including image crypto settings. This Dockerfile defines the runtime for `app/auth.py`'s `hmac`/`hashlib` calls; the boundary doc names this Dockerfile as the sole deployable.\n    \n    ##### Evidence\n    - `Dockerfile:1` selects a Debian slim Python base with no FIPS provider, no `OPENSSL_CONF`/FIPS module install, and no FIPS self-test.\n    - `app/auth.py:12,18,29` rely on that runtime's `hashlib`/`hmac` for password hashing and token signing.\n    \n    ##### Impact\n    - Token-signing and password-storage crypto protecting CUI access run on an unvalidated module.\n    - Assumption: no CI or registry step rebuilds on a hardened (e.g. Iron Bank UBI FIPS) base; no CI exists in the repo.\n  Recommendation: Rebase on a FIPS-enabled hardened image (e.g. Iron Bank UBI9 python with the OpenSSL FIPS provider enabled), pin it by digest, and add a startup check that the FIPS provider is active (e.g. fail if `hashlib.md5()` without `usedforsecurity=False` succeeds).\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: Dockerfile:1-4\n    Commentary: Base image is python:3.12-slim with only pip deps installed; no FIPS provider configuration.\n    Code:\n      FROM python:3.12-slim\n      WORKDIR /srv\n      COPY requirements.txt .\n      RUN pip install --no-cache-dir -r requirements.txt\n  Snippet: app/auth.py:10-19\n    Commentary: Security crypto (hashlib/hmac) that executes on the image's OpenSSL.\n    Code:\n      def hash_password(password: str) -> str:\n          # G1: MD5 is not FIPS 140-validated and is unsuitable for password storage\n          return hashlib.md5(password.encode()).hexdigest()\n      \n      \n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-8161f3a1753c4c2584317f8f6a2d8d49",
+   "title": "audit() records omit actor, source IP, UTC timestamp and outcome",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "AU-3",
+    "SRG-IL5-AUDIT-CONTENT"
+   ],
+   "raw": "- sfind-8161f3a1753c4c2584317f8f6a2d8d49: audit() records omit actor, source IP, UTC timestamp and outcome [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    Every audit record is `AUDIT <event> <detail>` through a logging format of `%(message)s`, so records carry no timestamp, source IP, outcome field, or consistent actor/object fields.\n    \n    ##### Applicability\n    SRG-IL5-AUDIT-CONTENT ISSM fields: actor, action, object, source IP, UTC timestamp, outcome (AU-3 code-owned per boundary doc).\n    \n    ##### Evidence\n    - `app/main.py:21` format string is message-only.\n    - `app/main.py:27-29` takes only event and detail; callers at 48, 51 pass the username as detail and line 67 passes the asset name, with no actor (`claims['sub']` is never logged) and no `request.client.host`.\n    \n    ##### Impact\n    - Asset reads cannot be attributed to a user or source; login records lack time and IP, undermining incident reconstruction.\n  Recommendation: Make audit(actor, action, object, outcome, request) emit structured JSON with `datetime.now(timezone.utc).isoformat()`, `request.client.host`, actor from claims, and success/failure; update every call site.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:21-29\n    Commentary: Message-only log format and two-field audit helper.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")\n      \n      app = FastAPI(title=\"Mission Readiness Tracker\", version=\"0.1.0\")\n      \n      \n      def audit(event: str, detail: str) -> None:\n          # G7: no actor, source address, outcome or UTC timestamp\n          log.info(\"AUDIT %s %s\", event, detail)\n  Snippet: app/main.py:62-68\n    Commentary: asset_read audit omits the authenticated actor and source IP.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-8076de51666a4ffc8fdc5235c7822a34",
+   "title": "Local username/password login instead of DoD PKI/CAC via IdP",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-2",
+    "SRG-IL5-PKI"
+   ],
+   "raw": "- sfind-8076de51666a4ffc8fdc5235c7822a34: Local username/password login instead of DoD PKI/CAC via IdP [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    User authentication is a local `POST /login` taking username and password as query parameters and checking them against the local users table; there is no CAC/PIV, mTLS client cert, or OIDC/Keycloak integration anywhere in `app/`.\n    \n    ##### Applicability\n    SRG-IL5-PKI: user authentication must use DoD PKI via the inherited Keycloak IdP (`docs/il5/00-boundary.md` lists IdP as inherited, IA-2(x) as code-owned).\n    \n    ##### Evidence\n    - `app/main.py:44-52` authenticates on password match and issues the app's own token.\n    - `app/main.py:55-59` accepts only that self-issued token.\n    \n    ##### Impact\n    - All user access to CUI relies on single-factor passwords; credentials also travel in the URL query string (logged by proxies).\n  Recommendation: Replace /login with OIDC against the platform Keycloak (CAC/x509 authenticator) and validate its JWTs (issuer, audience, exp, signature via JWKS) in require_token; remove local passwords.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-59\n    Commentary: Password-only login and self-issued bearer token validation.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}\n      \n      \n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-77fe55fe74ff4a1a9196cac7c1a0b941",
+   "title": "asset_read audit writes requested asset name into logs",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-77fe55fe74ff4a1a9196cac7c1a0b941: asset_read audit writes requested asset name into logs [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    The asset-read audit record writes the aircraft identifier into application logs; failed-login records write the submitted username (which may be a mistyped password). Status/location are not logged. Whether the identifier alone is CUI is an ISSM classification call.\n    \n    ##### Applicability\n    SRG-IL5-CUI: CUI must not be written to logs. The boundary doc classifies \"mission readiness status of named aircraft\" as CUI.\n    \n    ##### Evidence\n    - `app/main.py:67` logs `name`; `app/main.py:48` logs `username` on failure.\n    \n    ##### Impact\n    - Log collector (outside CUI-marked flows) accumulates which aircraft were queried; assumption that identifiers are CUI in combination with access patterns.\n  Recommendation: Log an opaque object reference (e.g. internal ID or hash) instead of the aircraft name, or confirm with the ISSM that the log pipeline is within the CUI boundary and mark records accordingly.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:67-67\n    Commentary: Asset identifier written to the log.\n    Code:\n          audit(\"asset_read\", name)"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-73c87b82723440aeaf58734ef37eeeeb",
+   "title": "/export guarded only by shared hard-coded API key, no role check",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-AUDIT-CONTENT",
+    "SRG-IL5-PKI",
+    "SRG-IL5-PRIV-ACCESS",
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-73c87b82723440aeaf58734ef37eeeeb: /export guarded only by shared hard-coded API key, no role check [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    `GET /export` returns the full CUI asset table to any caller presenting a single shared static `X-API-Key`, which is a literal in `app/settings.py`; there is no user identity, role check, or audit record on this bulk export.\n    \n    ##### Applicability\n    SRG-IL5-PKI (no shared static API-key authentication), SRG-IL5-SECRETS (no API keys in source), SRG-IL5-PRIV-ACCESS (privileged functions role-gated, no hard-coded bypasses), SRG-IL5-AUDIT-CONTENT (data read must be recorded).\n    \n    ##### Evidence\n    - `app/main.py:71-75` compares the header to `settings.API_KEY` with `!=` and returns all assets.\n    - `app/settings.py:4` holds the key literal ([REDACTED]).\n    - No `audit(...)` call on the export path.\n    \n    ##### Impact\n    - Anyone with repo access can bulk-exfiltrate all CUI with no attributable record.\n    - Key cannot be scoped per user or revoked without a code change.\n  Recommendation: Require IdP-authenticated users (require_token on PKI-backed JWT) and a configurable role claim (e.g. `mrt-exporter`) for /export, audit each export with actor/IP/outcome, and remove settings.API_KEY (rotate it). If a machine client is needed, use mTLS or a per-client secret from a Kubernetes Secret.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:71-75\n    Commentary: Export gated only by static key; no audit or role check.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/settings.py:3-4\n    Commentary: API key hard-coded in source.\n    Code:\n      # G2: hardcoded credential checked into source\n      API_KEY = \"mrt-export-7f3a9c2e1b4d5a6f8e9d0c1b2a3f4e5d\""
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-5f4814191cf746b9ad8ff28921d57849",
+   "title": "uvicorn serves plaintext HTTP on 0.0.0.0 with no in-repo TLS termination",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-TRANSIT"
+   ],
+   "raw": "- sfind-5f4814191cf746b9ad8ff28921d57849: uvicorn serves plaintext HTTP on 0.0.0.0 with no in-repo TLS termination [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    The container starts uvicorn on `0.0.0.0:8000` with no `--ssl-*` options, so CUI responses leave the pod in plaintext unless a platform ingress terminates TLS; no Ingress/Service/mesh config exists in the repo, and the boundary doc only says platform ingress is \"assumed\".\n    \n    ##### Applicability\n    SRG-IL5-TRANSIT requires CUI to be protected with TLS 1.2+ (FIPS ciphers) end to end and forbids plaintext listeners outside the pod unless platform TLS termination is documented. This CMD is the app's only listener.\n    \n    ##### Evidence\n    - `Dockerfile:6-7` exposes 8000 and launches uvicorn without TLS.\n    - `k8s/deployment.yaml:22-23` exposes containerPort 8000 with no Ingress, Service or mesh sidecar defined.\n    - `docs/il5/00-boundary.md:28` states TLS termination is \"platform ingress assumed\" without naming the terminating component or TLS settings.\n    \n    ##### Impact\n    - `/assets/{name}`, `/export` (CUI) and `/login` credentials/tokens travel in cleartext on the pod network if ingress TLS/mesh mTLS is not present.\n    - Could not verify: platform ingress or Istio mTLS config (Big Bang) \u2014 must come from the platform team.\n  Recommendation: Either document the platform TLS termination (Big Bang Istio ingress gateway + STRICT mTLS PeerAuthentication, TLS 1.2+ FIPS ciphers) in 00-boundary.md and add the Service/VirtualService manifests, or bind uvicorn to TLS with `--ssl-keyfile/--ssl-certfile` from a mounted Secret and restrict ciphers.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: Dockerfile:6-7\n    Commentary: Plain-HTTP uvicorn listener bound to all interfaces.\n    Code:\n      EXPOSE 8000\n      CMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]\n  Snippet: k8s/deployment.yaml:22-23\n    Commentary: Port exposed with no TLS-terminating Ingress/Service in the repo.\n    Code:\n                ports:\n                  - containerPort: 8000\n  Snippet: docs/il5/00-boundary.md:28-28\n    Commentary: Boundary doc only assumes platform ingress TLS; no component or TLS version/cipher parameters documented."
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-44adba2dc1034e1fb670ea5155207fea",
+   "title": "Seeded 'operator' account with literal weak password Password1",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-PASSWORD",
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-44adba2dc1034e1fb670ea5155207fea: Seeded 'operator' account with literal weak password Password1 [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    On import, the database seeds user `operator` with the literal password `Password1` (9 characters) in source; every deployment ships this known credential.\n    \n    ##### Applicability\n    SRG-IL5-SECRETS (no authenticators hard-coded in source) and SRG-IL5-PASSWORD (minimum 15 characters where passwords are used).\n    \n    ##### Evidence\n    - `app/db.py:14` inserts the account with a source-literal password; `app/main.py:44-52` will issue a token for it.\n    \n    ##### Impact\n    - Anyone with repo access can log in and read CUI asset readiness via `/assets/{name}`.\n    - The credential is shorter than the 15-character minimum and never expires.\n  Recommendation: Remove the seeded credential; provision accounts through the IdP (Keycloak/CAC), or for local test only read a bootstrap password from a Kubernetes Secret and gate seeding behind a test-only flag.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/db.py:14-15\n    Commentary: Hard-coded seeded account and password.\n    Code:\n      _conn.execute(\"INSERT INTO users VALUES (?, ?)\", (\"operator\", auth.hash_password(\"Password1\")))\n      _conn.commit()"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-4391e59747894fca90df2471b2d1c339",
+   "title": "Asset and export JSON responses carry no CUI marking",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-4391e59747894fca90df2471b2d1c339: Asset and export JSON responses carry no CUI marking [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    `/assets/{name}` and `/export` return mission-readiness records (CUI per boundary doc) as bare JSON with no CUI banner/marking field or header.\n    \n    ##### Applicability\n    SRG-IL5-CUI (DoDI 5200.48): CUI output from APIs and exports must be marked.\n    \n    ##### Evidence\n    - `app/main.py:68` returns the raw row; `app/main.py:75` returns `{\"assets\": [...]}`; no middleware adds a marking.\n    \n    ##### Impact\n    - Downstream consumers and exported files receive CUI without designation, risking mishandling.\n  Recommendation: Wrap CUI responses as `{\"cui_marking\": \"CUI\", \"data\": ...}` (with the designation indicator block as required by the ISSM) and add an `X-CUI-Marking: CUI` header via a response middleware for these routes.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:62-75\n    Commentary: CUI endpoints returning unmarked payloads.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row\n      \n      \n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-3e66ecd6dae94fdcbd43e3fe1108cead",
+   "title": "GET /login returns no DoD Notice and Consent Banner",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-8",
+    "SRG-IL5-BANNER"
+   ],
+   "raw": "- sfind-3e66ecd6dae94fdcbd43e3fe1108cead: GET /login returns no DoD Notice and Consent Banner [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    The pre-authentication endpoint returns only a usage hint; no standard DoD Notice and Consent Banner is displayed or returned, and login does not require acknowledgement.\n    \n    ##### Applicability\n    SRG-IL5-BANNER: the standard banner text must be presented before access and acknowledged (ISSM parameter in `docs/il5/00-boundary.md`; AC-8 code-owned).\n    \n    ##### Evidence\n    - `app/main.py:38-41` returns a one-line string; `app/main.py:44-45` accepts credentials without any consent parameter.\n    \n    ##### Impact\n    - Users are never notified of monitoring/consent terms before accessing a DoD system holding CUI.\n  Recommendation: Return the verbatim standard DoD Notice and Consent Banner from GET /login (and the API root), require an explicit `banner_ack=true` on POST /login (rejecting otherwise), and audit the acknowledgement.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:38-45\n    Commentary: Login page and handler with no banner or acknowledgement.\n    Code:\n      @app.get(\"/login\", response_class=PlainTextResponse)\n      def login_page():\n          # G6: no DoD Notice and Consent Banner before authentication\n          return \"POST username/password to /login\"\n      \n      \n      @app.post(\"/login\")\n      def login(username: str, password: str):"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-3d770b342d214f3cb328ba27f4a4ea71",
+   "title": "Token rejections, failed lookups and exports emit no audit record",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "AU-3",
+    "AU-6",
+    "SRG-IL5-AUDIT-CONTENT"
+   ],
+   "raw": "- sfind-3d770b342d214f3cb328ba27f4a4ea71: Token rejections, failed lookups and exports emit no audit record [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    Several security-relevant events produce no audit record: invalid/forged token rejections in `require_token`, 404 asset lookups, bulk `/export` success and 403 failures, and unhandled errors. (Session timeout and lockout events do not exist yet; see related findings.)\n    \n    ##### Applicability\n    SRG-IL5-AUDIT-CONTENT requires records for logon failure, privileged action and data read events.\n    \n    ##### Evidence\n    - `app/main.py:55-59` raises 401 with no audit.\n    - `app/main.py:65-66` raises 404 before the audit call at 67.\n    - `app/main.py:71-75` has no audit on either outcome.\n    \n    ##### Impact\n    - Token-forgery attempts and bulk CUI exports leave no trace for AU-6 review.\n  Recommendation: Add audit calls (with full AU-3 fields) for token rejection, asset not-found/failed reads, export success/denial, and in the exception handler.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:55-75\n    Commentary: Auth rejection, not-found and export paths without audit calls.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims\n      \n      \n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row\n      \n      \n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-3629a945f30e44ffa7a56ca67045ea21",
+   "title": "Bearer tokens never expire; no idle timeout or logout revocation",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SESSION"
+   ],
+   "raw": "- sfind-3629a945f30e44ffa7a56ca67045ea21: Bearer tokens never expire; no idle timeout or logout revocation [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    Issued tokens carry only `sub` and `iat`; `verify_token` checks the signature but never the token's age or last activity, and the app has no logout/revocation endpoint, so a token is valid forever (until `TOKEN_SECRET` rotates).\n    \n    ##### Applicability\n    SRG-IL5-SESSION: 15-minute server-side idle timeout, token expiry, and invalidation on logout (ISSM parameters in `docs/il5/00-boundary.md`). These functions are the app's only session mechanism.\n    \n    ##### Evidence\n    - `app/auth.py:15-19` builds a payload with no `exp`.\n    - `app/auth.py:22-32` returns claims after HMAC check with no time comparison.\n    - `app/settings.py:6` sets `SESSION_IDLE_MINUTES = None` and nothing reads it; `app/main.py:55-59` accepts any validly signed token; no logout route exists in `app/main.py`.\n    \n    ##### Impact\n    - A stolen or leaked token grants indefinite access to CUI via `/assets/{name}`.\n    - No session-timeout events can be audited because none occur.\n  Recommendation: Track sessions server-side (session id in token, last-activity timestamp in a store); reject and audit when now - last_activity > 15 min or now > exp, refresh last_activity on each request, and add a POST /logout that deletes the session. Set SESSION_IDLE_MINUTES=15.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/auth.py:15-32\n    Commentary: Token issue/verify with no exp claim and no age/idle check.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()\n      \n      \n      def verify_token(token: str):\n          try:\n              p, s = token.split(\".\")\n              payload = base64.urlsafe_b64decode(p)\n              sig = base64.urlsafe_b64decode(s)\n          except Exception:\n              return None\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):\n              return None\n          return json.loads(payload)\n  Snippet: app/settings.py:6-6\n    Commentary: Idle timeout setting is None and unused.\n    Code:\n      SESSION_IDLE_MINUTES = None  # G3: unset -> no timeout\n  Snippet: app/main.py:55-59\n    Commentary: require_token trusts any signed token.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-22d267ce2c4342278086b0d487c0518e",
+   "title": "Token signing key falls back to literal default 'change-me'",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-22d267ce2c4342278086b0d487c0518e: Token signing key falls back to literal default 'change-me' [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    Token HMAC signing uses `settings.TOKEN_SECRET`, which defaults to a hard-coded literal when the environment variable is absent, and the Deployment supplies it as a plaintext env value rather than a Secret reference.\n    \n    ##### Applicability\n    SRG-IL5-SECRETS: no signing keys hard-coded in source or manifests (including plaintext env values); keys must come from Kubernetes Secrets/external store.\n    \n    ##### Evidence\n    - `app/auth.py:18,29` sign and verify with `settings.TOKEN_SECRET`.\n    - `app/settings.py:5` supplies `[REDACTED]` default literal via `os.environ.get(..., default)`.\n    - `k8s/deployment.yaml:19-21` sets `TOKEN_SECRET` as a plaintext `value:` ([REDACTED]).\n    \n    ##### Impact\n    - Anyone who knows the public default (or reads the manifest) can forge tokens for any `sub` and read CUI via `/assets/{name}`.\n    - Startup does not fail when the secret is missing, so the weak default is silently used.\n  Recommendation: Remove the default (`os.environ['TOKEN_SECRET']`, fail fast if missing or shorter than 32 bytes) and inject it via `valueFrom.secretKeyRef` from a Kubernetes Secret/External Secrets store; rotate the exposed values.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/auth.py:18-18\n    Commentary: Signing uses settings.TOKEN_SECRET.\n    Code:\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n  Snippet: app/settings.py:5-5\n    Commentary: Hard-coded fallback default for the signing key.\n    Code:\n      TOKEN_SECRET = os.environ.get(\"TOKEN_SECRET\", \"change-me\")\n  Snippet: k8s/deployment.yaml:19-21\n    Commentary: Signing key provided as plaintext env value in the manifest.\n    Code:\n                env:\n                  - name: TOKEN_SECRET\n                    value: \"s3cr3t-in-plaintext\"            # G8: secret in env"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-12da8fbcddaa479aa8e1027228eea944",
+   "title": "Passwords stored as unsalted MD5 hashes",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:01:20",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CRYPTO",
+    "SRG-IL5-PASSWORD"
+   ],
+   "raw": "- sfind-12da8fbcddaa479aa8e1027228eea944: Passwords stored as unsalted MD5 hashes [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:01:20 UTC, category: deviation\n  Description: ##### Overview\n    `hash_password` stores and compares passwords as a bare unsalted MD5 hex digest; it is used for the seeded account and every login comparison.\n    \n    ##### Applicability\n    SRG-IL5-PASSWORD (stored only as FIPS-approved salted hashes) and SRG-IL5-CRYPTO (MD5 for security functions is disallowed). Password login remains the app's user authentication path.\n    \n    ##### Evidence\n    - `app/auth.py:10-12` returns `hashlib.md5(...).hexdigest()` with no salt or work factor.\n    - `app/db.py:14` stores that value in `users.password_hash`; `app/main.py:47` compares it with `!=` on login.\n    \n    ##### Impact\n    - All stored password authenticators are trivially reversible by rainbow table/GPU attack if the users table leaks.\n    - Under a FIPS-mode OpenSSL `hashlib.md5` would raise, so the login path would also break once the runtime is hardened.\n  Recommendation: Use `hashlib.pbkdf2_hmac('sha256', pw, salt, >=600000)` with a per-user random salt from `secrets.token_bytes(16)`, store `algo$iter$salt$hash`, compare with `hmac.compare_digest`, and rehash on next login.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/auth.py:10-12\n    Commentary: Unsalted MD5 password hash.\n    Code:\n      def hash_password(password: str) -> str:\n          # G1: MD5 is not FIPS 140-validated and is unsuitable for password storage\n          return hashlib.md5(password.encode()).hexdigest()\n  Snippet: app/main.py:46-47\n    Commentary: Login compares MD5 digests with a non-constant-time comparison.\n    Code:\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-f85d21757c3042f3a10cadda155d8804",
+   "title": "CUI asset and export JSON responses carry no CUI marking",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-f85d21757c3042f3a10cadda155d8804: CUI asset and export JSON responses carry no CUI marking [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    `GET /assets/{name}` and `GET /export` return mission readiness rows as plain JSON with no CUI banner field or header.\n    \n    ##### Applicability\n    \n    SRG-IL5-CUI (DoDI 5200.48): CUI output from API responses and exports must be marked. The boundary doc classifies readiness status of named aircraft as CUI.\n    \n    ##### Evidence\n    \n    main.py:62-68 returns the raw `assets` row; main.py:71-75 returns all rows under `assets`. Neither adds a marking field (e.g. `\"marking\": \"CUI\"`) or response header, and no middleware in main.py adds one.\n    \n    ##### Impact\n    \n    - All CUI leaving the API is unmarked, so downstream consumers and exports lose handling instructions.\n    - Assumed no gateway adds markings; not visible in repo.\n  Recommendation: Add a CUI marking to every CUI response (e.g. a `CUI` banner field in the JSON envelope and a response header via middleware) including exports.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:62-68\n    Commentary: Asset response returned without marking.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row\n  Snippet: app/main.py:71-75\n    Commentary: Bulk export returned without marking.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/db.py:9-10\n    Commentary: Seeded asset rows (aircraft, status, location) that constitute the CUI.\n    Code:\n          CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT NOT NULL);\n          CREATE TABLE assets (name TEXT PRIMARY KEY, status TEXT NOT NULL, location TEXT NOT NULL);"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-f7f4adf7ccae4e9096f1d7ceee26e3d9",
+   "title": "TOKEN_SECRET falls back to hard-coded default 'change-me'",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-f7f4adf7ccae4e9096f1d7ceee26e3d9: TOKEN_SECRET falls back to hard-coded default 'change-me' [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    If the `TOKEN_SECRET` environment variable is unset, the HMAC token signing key silently becomes a known literal.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS: signing keys must not be hard-coded and must come from a secret store.\n    \n    ##### Evidence\n    \n    settings.py:5 uses `os.environ.get(\"TOKEN_SECRET\", \"change-me\")`; auth.py:17 and :28 sign/verify tokens with it.\n    \n    ##### Impact\n    \n    - With the default, anyone can forge bearer tokens for any `sub` and read CUI.\n    - Whether deployment always sets the variable is a runtime matter (k8s/deployment.yaml sets it as a plaintext value).\n  Recommendation: Use `os.environ[\"TOKEN_SECRET\"]` (no default), fail fast at startup when missing, and source it from a Kubernetes Secret.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/settings.py:5-5\n    Commentary: Signing key env lookup with literal fallback.\n    Code:\n      TOKEN_SECRET = os.environ.get(\"TOKEN_SECRET\", \"change-me\")\n  Snippet: app/auth.py:15-19\n    Commentary: Token signing uses TOKEN_SECRET.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-e8d72597a018434c80f5fb2b3f12e039",
+   "title": "/export authenticates by shared static API key with no user identity",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-PKI",
+    "SRG-IL5-PRIV-ACCESS"
+   ],
+   "raw": "- sfind-e8d72597a018434c80f5fb2b3f12e039: /export authenticates by shared static API key with no user identity [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    Bulk export of all CUI assets is gated only by comparing an `X-Api-Key` header to one shared key; no user, role or PKI identity is established.\n    \n    ##### Applicability\n    \n    SRG-IL5-PKI: shared static API-key authentication is a gap; SRG-IL5-PRIV-ACCESS: privileged functions must be role-gated and configurable. DoD PKI/Keycloak is the inherited IdP per docs/il5/00-boundary.md, but this endpoint does not use it.\n    \n    ##### Evidence\n    \n    main.py:71-74 compares the header to `settings.API_KEY` (hard-coded at settings.py:4) with plain `!=`; no `require_token`, role claim or IdP check is on the path.\n    \n    ##### Impact\n    \n    - Anyone holding the key (it is in source) can export all CUI; actions cannot be attributed to an individual.\n    - The key cannot be scoped to authorized US-person administrators by the IdP.\n  Recommendation: Require an IdP-issued (DoD PKI/Keycloak) token with an export/admin role claim on `/export`; remove the static API key.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:71-75\n    Commentary: Export gated only by shared key comparison.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/settings.py:3-4\n    Commentary: The shared key is a literal in source.\n    Code:\n      # G2: hardcoded credential checked into source\n      API_KEY = \"mrt-export-7f3a9c2e1b4d5a6f8e9d0c1b2a3f4e5d\""
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-e4ff744dd2024f258c7d5130dc328cb6",
+   "title": "Container securityContext privileged:true and runAsUser:0",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-PRIV-ACCESS"
+   ],
+   "raw": "- sfind-e4ff744dd2024f258c7d5130dc328cb6: Container securityContext privileged:true and runAsUser:0 [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: observation\n  Description: ##### Artifact\n    \n    deployment.yaml:16-18 sets `privileged: true` and `runAsUser: 0` for the `mrt` container; image is `registry.example.mil/mrt:latest` (line 15), not digest-pinned.\n    \n    ##### Bears on\n    \n    SRG-IL5-PRIV-ACCESS: the workload runs with root and host-privileged rights regardless of any app-level role gating; cluster admission (Pod Security / Kyverno in Big Bang) is platform configuration whose evidence must come from the platform.\n    \n    ##### Limits\n    \n    Does not show whether an admission controller rejects this pod spec at deploy time.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: k8s/deployment.yaml:15-18\n    Commentary: Privileged root container with floating tag.\n    Code:\n                image: registry.example.mil/mrt:latest      # G8: floating tag, not digest-pinned\n                securityContext:\n                  privileged: true                           # G8: privileged container\n                  runAsUser: 0"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-e4b9785ac3214b8d91e1e90c99ce728e",
+   "title": "Export API key hard-coded as a literal in settings.py",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-5",
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-e4b9785ac3214b8d91e1e90c99ce728e: Export API key hard-coded as a literal in settings.py [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    `API_KEY` is a string literal committed to source and is the sole credential protecting `/export`.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS: no API keys hard-coded in source; must load from Kubernetes Secrets/external store. IA-5(7) is code-owned.\n    \n    ##### Evidence\n    \n    settings.py:4 assigns the key literal ([REDACTED]); main.py:73 compares the header against it.\n    \n    ##### Impact\n    \n    - Anyone with repo access (and git history) can export all CUI.\n    - Rotation requires a code change; the value persists in history and must be rotated.\n  Recommendation: Remove the literal; read the key from a Kubernetes Secret with no default and fail startup if absent (preferably replace with IdP auth), and rotate the exposed key.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/settings.py:3-4\n    Commentary: Literal API key in source (value redacted).\n    Code:\n      # G2: hardcoded credential checked into source\n      API_KEY = \"mrt-export-7f3a9c2e1b4d5a6f8e9d0c1b2a3f4e5d\"\n  Snippet: app/main.py:71-74\n    Commentary: Export authorization uses this key.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-d8140ebef3824a89bf79bd43858dab4f",
+   "title": "Password accepted as URL query parameter on POST /login",
+   "severity": "medium",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-5",
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-d8140ebef3824a89bf79bd43858dab4f: Password accepted as URL query parameter on POST /login [medium/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    `login(username: str, password: str)` declares plain scalar parameters, which FastAPI binds from the query string, so the password travels in the URL.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS (IA-5 protection of authenticators): authenticators must not be exposed in plaintext to logs or other destinations.\n    \n    ##### Evidence\n    \n    main.py:44-45: scalar parameters on a POST without `Body`/`Form` are query parameters (tests/test_app.py exercises this). URLs are recorded by uvicorn access logs, proxies and ingress logs.\n    \n    ##### Impact\n    \n    - Plaintext passwords can land in access logs collected by the platform log store (1-year retention).\n    - Exact access-log configuration in deployment is not visible in repo.\n  Recommendation: Accept credentials in a request body (`Form` or a Pydantic body model) and reject query-string credentials.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-45\n    Commentary: Password bound from query string.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-c598331cedac4ffe9c909aca7f0782e6",
+   "title": "Audit logging via logging.basicConfig to process stream",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-AUDIT-RETENTION"
+   ],
+   "raw": "- sfind-c598331cedac4ffe9c909aca7f0782e6: Audit logging via logging.basicConfig to process stream [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: observation\n  Description: ##### Artifact\n    \n    main.py:21-22 configures the stdlib root logger with `logging.basicConfig(level=logging.INFO, format=\"%(message)s\")` and logger `mrt`; `audit()` writes through it. basicConfig with no filename attaches a StreamHandler to stderr; no file handler or rotation is configured in the repo.\n    \n    ##### Bears on\n    \n    SRG-IL5-AUDIT-RETENTION: audit records are emitted to the container stream for platform collection. Retention (1 year online) is handed to the platform log store (CloudWatch/Loki per docs/il5/00-boundary.md); retention evidence must come from that platform's configuration.\n    \n    ##### Limits\n    \n    Does not show that a collector scrapes the stream, nor its retention period.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:21-22\n    Commentary: Logger configured to a stream with no local rotation.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-aa7b37083afc4ace99fbdb71081b5f52",
+   "title": "Deployment sets TOKEN_SECRET as plaintext env value in manifest",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SECRETS"
+   ],
+   "raw": "- sfind-aa7b37083afc4ace99fbdb71081b5f52: Deployment sets TOKEN_SECRET as plaintext env value in manifest [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    The token signing key is embedded as a literal `value:` in the Deployment manifest rather than referenced from a Secret.\n    \n    ##### Applicability\n    \n    SRG-IL5-SECRETS: no signing keys in Kubernetes manifests including plaintext env values; use Kubernetes Secrets.\n    \n    ##### Evidence\n    \n    deployment.yaml:20-21 sets `TOKEN_SECRET` to a literal ([REDACTED]); settings.py:5 consumes it as the HMAC signing key.\n    \n    ##### Impact\n    \n    - Anyone with repo or `kubectl get deploy -o yaml` access can forge tokens and read CUI.\n    - The value must be rotated since it is in git history.\n  Recommendation: Replace with `valueFrom.secretKeyRef` pointing at a Kubernetes Secret (or external secret store via Big Bang), and rotate the key.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: k8s/deployment.yaml:19-21\n    Commentary: Plaintext secret env value (redacted).\n    Code:\n                env:\n                  - name: TOKEN_SECRET\n                    value: \"s3cr3t-in-plaintext\"            # G8: secret in env\n  Snippet: app/settings.py:5-5\n    Commentary: Value becomes the token signing key.\n    Code:\n      TOKEN_SECRET = os.environ.get(\"TOKEN_SECRET\", \"change-me\")"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-99a65f9993994400b1f5dedfe0c57f0a",
+   "title": "Container exposes plain port 8000 with no Service/TLS in repo",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "observation",
+   "criteria_cited": [
+    "SRG-IL5-TRANSIT"
+   ],
+   "raw": "- sfind-99a65f9993994400b1f5dedfe0c57f0a: Container exposes plain port 8000 with no Service/TLS in repo [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: observation\n  Description: ##### Artifact\n    \n    deployment.yaml:22-23 declares `containerPort: 8000`; the app (uvicorn) serves HTTP with no TLS settings, and the repo contains no Service, Ingress or mesh configuration. docs/il5/00-boundary.md records 'no TLS termination in-app (platform ingress assumed)'.\n    \n    ##### Bears on\n    \n    SRG-IL5-TRANSIT: TLS for CUI in transit is handed off to the platform (Platform One ingress / service mesh). Evidence of TLS 1.2+ with FIPS ciphers end-to-end, including pod-to-ingress mTLS, must come from the platform ingress/Istio configuration.\n    \n    ##### Limits\n    \n    Does not show any TLS configuration or whether the port is reachable outside the pod network.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: k8s/deployment.yaml:22-23\n    Commentary: Plain HTTP container port.\n    Code:\n                ports:\n                  - containerPort: 8000"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-901a35851e914817beb6d4f3d5aed495",
+   "title": "No logout/revocation and require_token never checks token age",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-11",
+    "AC-12",
+    "SC-23",
+    "SRG-IL5-SESSION"
+   ],
+   "raw": "- sfind-901a35851e914817beb6d4f3d5aed495: No logout/revocation and require_token never checks token age [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    Tokens are accepted forever: `require_token` only verifies the HMAC, and the app has no logout or revocation endpoint.\n    \n    ##### Applicability\n    \n    SRG-IL5-SESSION: 15-minute server-side idle timeout; tokens must expire and be invalidated on logout. AC-11/AC-12/SC-23 are code-owned.\n    \n    ##### Evidence\n    \n    main.py:55-59 accepts any token for which `auth.verify_token` returns claims; auth.py:22-32 checks only the signature (no `exp`/`iat` comparison). No `/logout` route exists in main.py:38-80.\n    \n    ##### Impact\n    \n    - A stolen token grants permanent CUI access; there is no way to terminate a session.\n    - Session timeout events cannot be audited because none occur.\n  Recommendation: Add `exp` and last-activity tracking, enforce 15-minute idle expiry in `require_token`, and add a logout endpoint that revokes the token server-side (deny-list or session store).\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:55-59\n    Commentary: Token dependency with no age or revocation check.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims\n  Snippet: app/auth.py:22-32\n    Commentary: verify_token checks signature only.\n    Code:\n      def verify_token(token: str):\n          try:\n              p, s = token.split(\".\")\n              payload = base64.urlsafe_b64decode(p)\n              sig = base64.urlsafe_b64decode(s)\n          except Exception:\n              return None\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):\n              return None\n          return json.loads(payload)"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-7b8167f9a283407c8c16364ec584bff4",
+   "title": "Login has no failed-attempt counting or account lockout",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-7",
+    "SRG-IL5-LOCKOUT"
+   ],
+   "raw": "- sfind-7b8167f9a283407c8c16364ec584bff4: Login has no failed-attempt counting or account lockout [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    `POST /login` returns 401 on bad credentials without tracking attempts, so unlimited guessing is possible.\n    \n    ##### Applicability\n    \n    SRG-IL5-LOCKOUT: ISSM parameter requires lockout after 3 consecutive invalid attempts within 15 minutes, for 15 minutes. AC-7 is code-owned per docs/il5/00-boundary.md.\n    \n    ##### Evidence\n    \n    main.py:46-49 checks the password and raises 401; no counter, timestamp or lock state is read or written, and the `users` table (db.py:7) has no lockout columns.\n    \n    ##### Impact\n    \n    - Password guessing against `operator` (weak seeded password) is unbounded.\n    - No lockout events exist to audit.\n  Recommendation: Track failed attempts per account (timestamped), lock after 3 within 15 minutes for 15 minutes, reject logins while locked, and audit lockout events.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-52\n    Commentary: Login path with no attempt tracking.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}\n  Snippet: app/db.py:7-7\n    Commentary: User table without lockout state.\n    Code:\n      _conn.executescript("
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-67042a81551e4e999fcef9519050cd7e",
+   "title": "audit() records lack actor, source IP, UTC time and outcome; events unaudited",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-7",
+    "AU-12",
+    "AU-2",
+    "AU-3",
+    "SRG-IL5-AUDIT-CONTENT"
+   ],
+   "raw": "- sfind-67042a81551e4e999fcef9519050cd7e: audit() records lack actor, source IP, UTC time and outcome; events unaudited [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    `audit()` logs only an event name and one free-text detail, with a log format of bare `%(message)s`. Several security-relevant events (export, token rejection, forbidden export) emit no audit record at all.\n    \n    ##### Applicability\n    \n    SRG-IL5-AUDIT-CONTENT: ISSM parameters require actor, action, object, source IP, UTC timestamp and outcome for logon success/failure, data reads/changes and similar events. AU-2/AU-3/AU-12 are code-owned per docs/il5/00-boundary.md.\n    \n    ##### Evidence\n    \n    - main.py:21 sets `format=\"%(message)s\"` so no timestamp is emitted; main.py:27-29 takes no actor, source address or outcome.\n    - main.py:67 `asset_read` records the asset name but not the token subject (`claims['sub']`) or `request.client.host`.\n    - main.py:71-75 `/export` (bulk CUI read) writes no audit record on success or on the 403 path; main.py:55-59 token rejection is unaudited.\n    \n    ##### Impact\n    \n    - Lost record: who read which CUI asset, from where, when; bulk export is entirely untraced.\n    - Login failures are recorded only by username, so lockout analysis (AC-7) has no source data.\n  Recommendation: Make `audit()` emit structured JSON with actor, action, object, source IP (from `Request`), UTC ISO-8601 timestamp and outcome; call it on login ok/fail, token rejection, asset read, export success/deny.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:21-22\n    Commentary: Log format omits timestamp.\n    Code:\n      logging.basicConfig(level=logging.INFO, format=\"%(message)s\")\n      log = logging.getLogger(\"mrt\")\n  Snippet: app/main.py:27-29\n    Commentary: Audit function carries only event and detail.\n    Code:\n      def audit(event: str, detail: str) -> None:\n          # G7: no actor, source address, outcome or UTC timestamp\n          log.info(\"AUDIT %s %s\", event, detail)\n  Snippet: app/main.py:62-68\n    Commentary: Asset read audit omits actor and source.\n    Code:\n      @app.get(\"/assets/{name}\")\n      def get_asset(name: str, claims=Depends(require_token)):\n          row = db.find_asset(name)\n          if not row:\n              raise HTTPException(status_code=404, detail=\"no such asset\")\n          audit(\"asset_read\", name)\n          return row\n  Snippet: app/main.py:71-75\n    Commentary: Export path emits no audit record.\n    Code:\n      @app.get(\"/export\")\n      def export(x_api_key: str = Header(default=\"\")):\n          if x_api_key != settings.API_KEY:\n              raise HTTPException(status_code=403, detail=\"forbidden\")\n          return {\"assets\": db.all_assets()}\n  Snippet: app/main.py:55-59\n    Commentary: Token rejection emits no audit record.\n    Code:\n      def require_token(authorization: str = Header(default=\"\")):\n          claims = auth.verify_token(authorization.replace(\"Bearer \", \"\"))\n          if not claims:\n              raise HTTPException(status_code=401, detail=\"invalid token\")\n          return claims"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-5a1f0638b2d84273ac66ac441f8ca7dc",
+   "title": "GET /login returns no DoD Notice and Consent Banner or acknowledgement",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "AC-8",
+    "SRG-IL5-BANNER"
+   ],
+   "raw": "- sfind-5a1f0638b2d84273ac66ac441f8ca7dc: GET /login returns no DoD Notice and Consent Banner or acknowledgement [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    The pre-authentication `GET /login` response is a one-line usage hint; `POST /login` issues a token without any banner acknowledgement.\n    \n    ##### Applicability\n    \n    SRG-IL5-BANNER: ISSM parameter (docs/il5/00-boundary.md) requires the standard DoD Notice and Consent Banner text before access with acknowledgement. AC-8 is listed as code-owned in the boundary doc, and `/login` is the app's only pre-auth entry point.\n    \n    ##### Evidence\n    \n    main.py:38-41 returns `POST username/password to /login` (observed text) instead of the standard banner text beginning 'You are accessing a U.S. Government (USG) Information System (IS)...'. main.py:44-52 accepts credentials and returns a token with no acknowledgement parameter or check.\n    \n    ##### Impact\n    \n    - Users and the `/export` caller reach CUI with no notice of monitoring/consent, losing the legal basis the banner provides.\n    - No other banner source (ingress, IdP) is configured in the repo; if the platform displays one, that must be evidenced separately.\n  Recommendation: Return the verbatim standard DoD Notice and Consent Banner from `GET /login` and require an explicit acknowledgement field (e.g. `banner_ack=true`) on `POST /login`, rejecting logins without it.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:38-41\n    Commentary: Pre-auth response text with no banner.\n    Code:\n      @app.get(\"/login\", response_class=PlainTextResponse)\n      def login_page():\n          # G6: no DoD Notice and Consent Banner before authentication\n          return \"POST username/password to /login\"\n  Snippet: app/main.py:44-52\n    Commentary: Login issues a token with no banner acknowledgement check.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-4c83e71b63d243cb9bc812714248c390",
+   "title": "Global exception handler returns exception text and traceback to clients",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-CUI"
+   ],
+   "raw": "- sfind-4c83e71b63d243cb9bc812714248c390: Global exception handler returns exception text and traceback to clients [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    The catch-all handler `debug_exception_handler` returns `str(exc)` and the full `traceback.format_exc()` in every 500 response. No configuration flag gates it, so it is active in all environments.\n    \n    ##### Applicability\n    \n    SRG-IL5-CUI: the application must not write CUI to error messages. The service handles CUI (mission readiness status of named aircraft, per docs/il5/00-boundary.md), and this is the only error handler for unexpected exceptions on every route.\n    \n    ##### Evidence\n    \n    main.py:32-35 registers the handler for `Exception` and puts the exception message and traceback in the JSON body. Unhandled errors on CUI routes (e.g. sqlite3 errors raised from `db.find_asset`, db.py:22-25, reached from `GET /assets/{name}`) carry SQL text, file paths and code lines back to the caller.\n    \n    ```\n    GET /assets/<name> --> db.find_asset (concatenated SQL) --sqlite3 error--> debug_exception_handler --> {error, trace} to client\n    ```\n    \n    ##### Impact\n    \n    - Affects every route; internal paths, SQL statements and values from CUI queries can leak in error bodies.\n    - Assumed: no proxy strips 500 bodies in front of the pod; not verifiable from the repo.\n  Recommendation: Return a generic error body (e.g. `{\"error\": \"internal error\", \"id\": <correlation id>}`) and log the traceback server-side via the audit/log pipeline, without CUI values.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:32-35\n    Commentary: Catch-all handler returns exception string and traceback in the response body.\n    Code:\n      @app.exception_handler(Exception)\n      async def debug_exception_handler(request: Request, exc: Exception):\n          # G5: internals leak to the client\n          return JSONResponse(status_code=500, content={\"error\": str(exc), \"trace\": traceback.format_exc()})\n  Snippet: app/db.py:22-25\n    Commentary: CUI query path whose failures are surfaced through the handler.\n    Code:\n      \n      def find_asset(name: str):\n          # G4: SQL injection via string concatenation\n          row = _conn.execute(\"SELECT * FROM assets WHERE name = '\" + name + \"'\").fetchone()"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-3fa71bc5d7b94a8eb6e91c3ff3a21a13",
+   "title": "SESSION_IDLE_MINUTES set to None; idle timeout never configured",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "SRG-IL5-SESSION"
+   ],
+   "raw": "- sfind-3fa71bc5d7b94a8eb6e91c3ff3a21a13: SESSION_IDLE_MINUTES set to None; idle timeout never configured [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    The only session-timeout setting is `None` and is not referenced anywhere in the code.\n    \n    ##### Applicability\n    \n    SRG-IL5-SESSION: ISSM parameter requires a 15-minute server-side idle timeout.\n    \n    ##### Evidence\n    \n    settings.py:6 sets `SESSION_IDLE_MINUTES = None`; auth.py `issue_token`/`verify_token` (lines 15-32) never read it. Observed: none; required: 15 minutes.\n    \n    ##### Impact\n    \n    - Sessions never time out on inactivity on any route.\n  Recommendation: Set `SESSION_IDLE_MINUTES = 15` (configurable, no `None`) and enforce it in `verify_token`/`require_token`.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/settings.py:6-6\n    Commentary: Idle timeout unset.\n    Code:\n      SESSION_IDLE_MINUTES = None  # G3: unset -> no timeout\n  Snippet: app/auth.py:15-32\n    Commentary: Token issue/verify ignore the setting.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()\n      \n      \n      def verify_token(token: str):\n          try:\n              p, s = token.split(\".\")\n              payload = base64.urlsafe_b64decode(p)\n              sig = base64.urlsafe_b64decode(s)\n          except Exception:\n              return None\n          expected = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          if not hmac.compare_digest(sig, expected):\n              return None\n          return json.loads(payload)"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-3f80e358303a491da32b454920dab3a2",
+   "title": "POST /login uses local username/password, not DoD PKI/CAC",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "deviation",
+   "criteria_cited": [
+    "IA-2",
+    "SRG-IL5-PKI"
+   ],
+   "raw": "- sfind-3f80e358303a491da32b454920dab3a2: POST /login uses local username/password, not DoD PKI/CAC [high/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: deviation\n  Description: ##### Overview\n    \n    User authentication is a local password check against the in-app `users` table; no CAC/PIV or IdP federation exists in the app.\n    \n    ##### Applicability\n    \n    SRG-IL5-PKI: user authentication must use DoD PKI via the inherited DoD PKI/Keycloak IdP; local password-only authentication is a gap. IA-2(x) is code-owned per docs/il5/00-boundary.md (the IdP is inherited, its integration is not).\n    \n    ##### Evidence\n    \n    main.py:44-52 looks up `db.get_user` and compares `auth.hash_password(password)` to the stored hash, then issues its own HMAC token (auth.py:15-19). No OIDC/SAML or client-certificate handling is present.\n    \n    ##### Impact\n    \n    - All CUI reads are protected by a single-factor password (seeded user `operator`/weak password in db.py:14).\n    - Whether an ingress enforces mTLS/CAC in front of the app cannot be seen in the repo.\n  Recommendation: Replace local login with OIDC/SAML federation to the DoD PKI/Keycloak IdP and validate IdP-issued tokens in `require_token`.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:44-52\n    Commentary: Local password login issuing an app token.\n    Code:\n      @app.post(\"/login\")\n      def login(username: str, password: str):\n          user = db.get_user(username)\n          if not user or user[\"password_hash\"] != auth.hash_password(password):\n              audit(\"login_failed\", username)\n              raise HTTPException(status_code=401, detail=\"bad credentials\")\n          token = auth.issue_token(username)\n          audit(\"login_ok\", username)\n          return {\"token\": token}\n  Snippet: app/auth.py:15-19\n    Commentary: App-minted token instead of IdP token.\n    Code:\n      def issue_token(username: str) -> str:\n          # G3: no expiry / idle timeout; token is valid forever\n          payload = json.dumps({\"sub\": username, \"iat\": int(time.time())}).encode()\n          sig = hmac.new(settings.TOKEN_SECRET.encode(), payload, hashlib.sha256).digest()\n          return base64.urlsafe_b64encode(payload).decode() + \".\" + base64.urlsafe_b64encode(sig).decode()"
+  },
+  {
+   "framework": "dod-cc-srg-il5",
+   "finding_id": "sfind-0f4eec87a608445dac83b1ef97244b01",
+   "title": "Module docstring planted-gap register (G1-G8)",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-c3960b3b4c884acf90dcf6931f910461",
+   "created_utc": "2026-10-27 09:00:50",
+   "category": "observation",
+   "criteria_cited": [
+    "AC-11",
+    "AC-12",
+    "AC-8",
+    "AU-12",
+    "AU-3",
+    "CM-5",
+    "IA-5",
+    "SC-13",
+    "SI-10",
+    "SI-11",
+    "SR-3",
+    "SRG-IL5-AUDIT-CONTENT",
+    "SRG-IL5-BANNER",
+    "SRG-IL5-CRYPTO",
+    "SRG-IL5-CUI",
+    "SRG-IL5-SECRETS",
+    "SRG-IL5-SESSION"
+   ],
+   "raw": "- sfind-0f4eec87a608445dac83b1ef97244b01: Module docstring planted-gap register (G1-G8) [low/open] repo: achilli444/il5-uplift-demo, scan: scan-c3960b3b4c884acf90dcf6931f910461 created 2026-10-27 09:00:50 UTC, category: observation\n  Description: ##### Artifact\n    \n    main.py:3-11 is a docstring listing eight seeded gaps with their control references and code locations (MD5 hashing, hard-coded API key, no idle timeout, SQL concatenation, stack trace to client, no consent banner, audit fields missing, privileged pod/latest tag/secret in env).\n    \n    ##### Bears on\n    \n    Document artifact referencing SRG-IL5-CRYPTO, SRG-IL5-SECRETS, SRG-IL5-SESSION, SRG-IL5-CUI, SRG-IL5-BANNER and SRG-IL5-AUDIT-CONTENT locations.\n    \n    ##### Limits\n    \n    A developer note only; it does not itself change behavior or record remediation status.\n  Scan session: 8b9caa6eca2545058f9523d47727bd12\n  Snippet: app/main.py:3-11\n    Commentary: Planted-gap register.\n    Code:\n      Planted gaps (do not fix here; the uplift PRs fix them):\n        G1 MD5 password hashing            (IA-5(1), SC-13, ASD STIG password storage)      -> auth.hash_password\n        G2 Hardcoded API key                (IA-5(7), CWE-798)                               -> settings.API_KEY\n        G3 No idle session timeout         (AC-11/AC-12, ASD STIG 15-min idle)              -> auth.issue_token\n        G4 SQL built by string concat      (SI-10, CWE-89)                                   -> db.find_asset\n        G5 Stack trace returned to client  (SI-11, CWE-209)                                  -> main.debug_exception_handler\n        G6 No DoD consent banner           (AC-8)                                            -> GET /login has no banner\n        G7 Audit log missing who/where     (AU-3, AU-12)                                     -> main.audit\n        G8 Privileged pod, latest tag, secret in env (K8s STIG, CM-5(6), SR-3)              -> k8s/deployment.yaml"
+  },
+  {
+   "framework": "kubernetes-stig-v2r6",
+   "finding_id": "sfind-9c145066b20045ed8e044d118d7a3695",
+   "title": "Dockerfile has no USER directive, so the mrt image runs as root",
+   "severity": "high",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-63e0dadf072843d78ef6f9b5515c55f8",
+   "created_utc": "2026-10-27 08:59:30",
+   "category": "deviation",
+   "criteria_cited": [
+    "V-242383",
+    "V-242415",
+    "V-242437",
+    "V-274883"
+   ],
+   "raw": "- sfind-9c145066b20045ed8e044d118d7a3695: Dockerfile has no USER directive, so the mrt image runs as root [high/open] repo: achilli444/il5-uplift-demo, scan: scan-63e0dadf072843d78ef6f9b5515c55f8 created 2026-10-27 08:59:30 UTC, category: deviation\n  Description: ##### Overview\n    The `mrt` image built from `Dockerfile` never sets a non-root `USER`, so the uvicorn process runs as UID 0 (the `python:3.12-slim` default) unless the pod spec overrides it. `k8s/deployment.yaml` does not override it. It sets `runAsUser: 0` and `privileged: true` (lines 16-18), which another batch covers. Cluster-wide PSA admission is owned by the platform (docs/il5/00-boundary.md).\n    \n    ##### Applicability\n    V-242437 (CAT I) requires a pod security policy. For Kubernetes 1.25 and later this means Pod Security Admission at the `restricted` level, which requires `runAsNonRoot: true`. The Dockerfile is the only in-repo artifact that sets the container's default user, so it is in scope. The namespace PSA label and the cluster admission config are not in this repo; that evidence must come from the platform team's cluster configuration.\n    \n    ##### Evidence\n    - Dockerfile lines 1-7 go from `FROM` to `CMD` with no `USER` instruction and create no non-root account. The image's default identity therefore stays root.\n    - Under the `restricted` profile, a pod that sets `runAsNonRoot: true` with this image would be rejected by the kubelet, because the image has no non-root UID. A pod without that field runs as root.\n    - k8s/deployment.yaml lines 16-18 explicitly set root and privileged mode, so nothing downstream corrects this.\n    \n    ##### Impact\n    - The CUI-handling API process runs as root inside the container. Any code-execution flaw in the app (for example the SQL injection or debug handler seeded in `app/`) gives root in the container, and with `privileged: true` that extends to the node.\n    - The image cannot run under PSA `restricted` without being rebuilt.\n    - Not verified: whether the platform's admission controller (Kyverno/Gatekeeper in Big Bang) would block or mutate this pod at runtime.\n  Recommendation: Create an unprivileged account and switch to it before CMD, for example `RUN groupadd -r -g 10001 mrt && useradd -r -u 10001 -g mrt mrt` with `COPY --chown=10001:10001 app ./app` and then `USER 10001` (use a numeric UID so `runAsNonRoot` can verify it). In k8s/deployment.yaml, set `runAsNonRoot: true`, `runAsUser: 10001`, `allowPrivilegeEscalation: false` and `capabilities.drop: [ALL]`, and remove `privileged: true`. Port 8000 needs no root.\n  Note: Aggregation: only deviation in this scan; no duplicates. Verified at 45da2de: Dockerfile lines 1-7 have no USER, and k8s/deployment.yaml:16-18 sets privileged: true and runAsUser: 0. The finding text says another batch covers those lines, but this scan has no finding for them. Fix both in one PR: add a numeric non-root USER in Dockerfile, and in the pod securityContext set runAsNonRoot/runAsUser 10001, allowPrivilegeEscalation false, drop ALL, and remove privileged. Sibling gaps in the repo that no finding covers (not created here, recorded for follow-up): k8s/deployment.yaml:19-21 has a plaintext secret in env TOKEN_SECRET (value [REDACTED]) that bears on V-242415/V-274883, and the Deployment declares no metadata.namespace, so it lands in default (V-242383). Out of scope (platform-inherited): cluster PSA namespace labels, admission controllers (Kyverno/Gatekeeper), and Service/NodePort exposure. Kept HIGH because the gap maps to CAT I V-242437 with root plus privileged in the in-repo manifests. No CODEOWNERS file. The only committer is Devin (seed commit 977214f).\n  Code owners: Devin <devin@cognition.ai>\n  Scan session: 1591f8db92d947ff96d216c432138c1f\n  Snippet: Dockerfile:1-7\n    Commentary: The entire Dockerfile: the base image defaults to root and no USER instruction appears before CMD.\n    Code:\n      FROM python:3.12-slim\n      WORKDIR /srv\n      COPY requirements.txt .\n      RUN pip install --no-cache-dir -r requirements.txt\n      COPY app ./app\n      EXPOSE 8000\n      CMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]\n  Snippet: k8s/deployment.yaml:16-18\n    Commentary: The pod spec does not override the image user: it explicitly runs as UID 0 and privileged.\n    Code:\n                securityContext:\n                  privileged: true                           # G8: privileged container\n                  runAsUser: 0"
+  },
+  {
+   "framework": "kubernetes-stig-v2r6",
+   "finding_id": "sfind-53f0a8380cdf4c4189c2245afb3c5817",
+   "title": "Dockerfile EXPOSE 8000 and uvicorn bind on port 8000",
+   "severity": "low",
+   "status": "open",
+   "repo": "achilli444/il5-uplift-demo",
+   "scan_id": "scan-63e0dadf072843d78ef6f9b5515c55f8",
+   "created_utc": "2026-10-27 08:59:30",
+   "category": "observation",
+   "criteria_cited": [
+    "V-242414"
+   ],
+   "raw": "- sfind-53f0a8380cdf4c4189c2245afb3c5817: Dockerfile EXPOSE 8000 and uvicorn bind on port 8000 [low/open] repo: achilli444/il5-uplift-demo, scan: scan-63e0dadf072843d78ef6f9b5515c55f8 created 2026-10-27 08:59:30 UTC, category: observation\n  Description: ##### Artifact\n    Dockerfile line 6 declares `EXPOSE 8000`. Line 7 starts uvicorn bound to `0.0.0.0` on port 8000 inside the container. k8s/deployment.yaml line 23 declares `containerPort: 8000` and sets no `hostPort` or `hostNetwork`.\n    \n    ##### Bears on\n    V-242414: which host ports user pods use. The container listens on TCP 8000. How that port is exposed on nodes (Service type, NodePort range, ingress) is not defined in this repo, which contains no Service manifest. That evidence must come from the deployed cluster (`kubectl get pods,svc -A -o yaml`) or from platform ingress configuration.\n    \n    ##### Limits\n    These lines do not show the runtime pod spec after any admission mutation, and they do not show how the platform publishes the port.\n  Scan session: 1591f8db92d947ff96d216c432138c1f\n  Snippet: Dockerfile:6-7\n    Commentary: Exposes container port 8000; uvicorn listens on 0.0.0.0:8000.\n    Code:\n      EXPOSE 8000\n      CMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]"
+  }
+ ]
+}

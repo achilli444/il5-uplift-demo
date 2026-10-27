@@ -1,0 +1,6 @@
+control,out_of_scope,reason
+IA-5(7),not-in-baseline,listed as code-owned in 00-boundary.md but not in the OSCAL Rev 5 High baseline resolved catalog; ISSO to confirm whether to tailor in
+SI-15,not-in-baseline,listed as code-owned in 00-boundary.md but not in the OSCAL Rev 5 High baseline resolved catalog; ISSO to confirm whether to tailor in
+CM-5(6),not-in-baseline,listed as code-owned in 00-boundary.md but not in the OSCAL Rev 5 High baseline resolved catalog; ISSO to confirm whether to tailor in
+SR-4,not-in-baseline,listed as code-owned in 00-boundary.md but not in the OSCAL Rev 5 High baseline resolved catalog; ISSO to confirm whether to tailor in
+"Families/controls marked inherited or organizational in 00-boundary.md (AC-1, AC-2, AC-17, AU-6, IA-4, SC-7, SC-28, SI-4, CM-3, SR-1/2, physical, personnel, contingency, etc.)",inherited/organizational,not code-owned; covered by platform SSP or ISSO
